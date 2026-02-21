@@ -23,6 +23,7 @@ Every tool you build produces this file tree:
 core/<tool>/
   DECISIONS.md                 <- Step 1: list every business decision
   contracts.py                 <- Step 2: ToolInput, ToolOutput, run()
+  __init__.py                  <- Required for consistent imports
   examples/                    <- Step 2: contract payload examples
     happy_path.json
     invalid_path.json
@@ -35,14 +36,18 @@ core/<tool>/
     orchestrator.py            <- Step 4: dumb sequencer (max 60 lines)
   tests/                       <- Step 3: unit tests (no I/O)
   MIGRATION_MAP.md             <- Migration only: old -> new mapping
+  README.md                    <- Short per-tool run/usage notes (required)
 
 adapters/flask/<tool>/         <- Step 5: built LAST, after core is complete
+  __init__.py
   app.py
   io.py                        <- side effects only
   presenter.py                 <- HTTP/template mapping only
   RUNTIME_DEPENDENCIES.md       <- adapter runtime libs + install command
+  assets/                      <- required for tool-specific files (PDFs, etc.)
   templates/
   static/
+  tests/                       <- adapter smoke tests (required)
 ```
 
 ## Hard Rules
@@ -65,13 +70,16 @@ These are non-negotiable. Automated checks enforce them.
 | Adapter imports must be declared in requirements | `check_adapter_dependencies.py` |
 | Adapter smoke tests must pass (Flask) | `check_adapter_smoke.py` |
 | Domain models are plain dataclasses — no methods with side effects | Convention |
+| Each tool must include __init__.py in core and adapters packages | Convention |
+| Adapters must only call core via contracts.run | Convention |
+| tools_registry entries must include name, description, status, contracts, origin, path, icon | Convention |
 
 ## Workflow
 
 Follow `docs/soft/WORKFLOW.md` in order. The steps are:
 
-1. **Decisions** — Write `core/<tool>/DECISIONS.md`. List every business decision the tool makes (not how, just what).
-2. **Data Shapes** — Create `domain/models.py`, `domain/specs.py`, and `contracts.py`. Plain dataclasses only.
+1. **Decisions** — Write `core/<tool>/DECISIONS.md`. List every business decision the tool makes (not how, just what), plus a **Non-goals** section.
+2. **Data Shapes** — Create `domain/models.py`, `domain/specs.py`, and `contracts.py`. Plain dataclasses only. Include a `contracts_version` string in ToolInput/ToolOutput and document it in `schema_checklist.md`.
 3. **Decision Functions** — Implement `application/service.py` and write tests. Pure functions, no I/O.
 4. **Orchestrator** — Write `application/orchestrator.py`. A dumb sequencer that calls your service functions in order. Max 60 lines, no branching.
 5. **Adapters** — NOW you can touch `adapters/`. Build Flask routes, templates, static files. Convert HTTP requests to domain objects, call core, convert back.
