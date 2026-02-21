@@ -101,6 +101,21 @@ Run these before you consider a tool complete:
 
 ```
 python3 scripts/preflight.py              # runs ALL checks
+python3 scripts/preflight_core.py --full-report --report-json .reports/preflight-core.json
 python3 scripts/soft_checkpoints.py <tool> # check workflow progress
 python3 scripts/install_hooks.py           # install git hooks
 ```
+
+## Runtime Gate
+
+- Runtime entry points should enforce `scripts/preflight_core.py` before startup.
+- Use `scripts/runtime_gate.py` for strict startup gating.
+- Startup must be blocked when checks fail.
+- On failure, read the JSON report under `.reports/` and fix until green.
+
+## Immutable Governance Files
+
+- Deterministic tests/checks are protected and must not be modified during normal agent work.
+- Enforcement script: `scripts/check_protected_files.py` (runs inside `preflight_core.py`).
+- Protected paths include `scripts/check_*.py`, preflight scripts, `tests/test_enforcement_flow.py`, and CI workflow guardrails.
+- Human override only: `ALLOW_PROTECTED_CHANGES=1`.

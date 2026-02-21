@@ -8,6 +8,8 @@ python3 adapters/flask/_base/demo_app.py
 ```
 Then open `http://localhost:8000`.
 
+Demo startup is strict by default and runs a preflight core gate first.
+
 ## Files
 - `templates/base.html`
 - `templates/demo.html`

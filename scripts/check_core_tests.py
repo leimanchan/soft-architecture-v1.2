@@ -100,6 +100,11 @@ def _test_has_negative_path(path: Path) -> bool:
     return False
 
 
+def _test_file_is_meaningful(path: Path) -> bool:
+    # Each test file should prove behavior (assertions) or validate failures.
+    return _test_has_nontrivial_assert(path) or _test_has_negative_path(path)
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     core_dir = root / "core"
@@ -158,6 +163,13 @@ def main() -> int:
             continue
         if not any(_test_has_nontrivial_assert(p) for p in test_files):
             failures.append(f"{tool_name}: tests only contain trivial asserts (assert real behavior)")
+            continue
+        weak_files = [p.name for p in test_files if not _test_file_is_meaningful(p)]
+        if weak_files:
+            failures.append(
+                f"{tool_name}: weak test files with no behavioral asserts/negative-path checks: "
+                + ", ".join(sorted(weak_files))
+            )
             continue
         if not any(_test_calls_run(p) for p in test_files):
             failures.append(f"{tool_name}: tests do not call run() (exercise contracts.run)")

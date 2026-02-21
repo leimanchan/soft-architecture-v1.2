@@ -101,6 +101,19 @@ python3 scripts/install_hooks.py
 python3 scripts/preflight.py
 ```
 
+## Structured Reports (LLM Retry Loop)
+Generate machine-readable reports for automatic fix/retry cycles:
+```
+python3 scripts/preflight_core.py --full-report --report-json .reports/preflight-core.json
+python3 scripts/preflight.py --full-report --report-json .reports/preflight-all.json
+```
+
+Deterministic governance files are immutable by default and enforced by `scripts/check_protected_files.py`.
+Human override only:
+```
+ALLOW_PROTECTED_CHANGES=1 python3 scripts/preflight_core.py
+```
+
 ## CI vs Local
 - CI: `python3 scripts/preflight_core.py`
 - Local: `python3 scripts/preflight.py`
@@ -120,3 +133,6 @@ To preview the shared UI components (not a tool — just the base template kit):
 python3 adapters/flask/_base/demo_app.py
 ```
 Then open `http://localhost:8000`.
+
+By default, demo startup is gated by `scripts/preflight_core.py` and will fail fast if checks do not pass.
+When blocked, a JSON report is written under `.reports/`.
