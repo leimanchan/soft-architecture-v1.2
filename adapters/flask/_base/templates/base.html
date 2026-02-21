@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tool Hub{% endblock %}</title>
+    <link rel="stylesheet" href="/static/shared/style.css">
+    {% block extra_head %}{% endblock %}
+</head>
+<body class="tool-hub">
+    <div class="site-nav">
+        <div class="site-nav-inner">
+            <div class="site-nav-brand">
+                <i data-lucide="waves"></i>
+                <span>Tool Hub Soft</span>
+            </div>
+            <div class="site-nav-links">
+                <span class="site-nav-pill">Soft Code</span>
+                <span class="site-nav-pill">Adapters</span>
+                <span class="site-nav-pill">Registry</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="page">
+        <div class="header-actions">
+            {% block header_actions %}{% endblock %}
+        </div>
+        <div class="container">
+            <header class="page-header">
+                <div class="page-title">
+                    <div class="page-icon"><i data-lucide="{% block icon %}grid{% endblock %}"></i></div>
+                    <div class="page-title-text">
+                        <h1>{% block header %}Tool Hub{% endblock %}</h1>
+                        <div class="page-subtitle">{% block subtitle %}{% endblock %}</div>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main">
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/static/shared/footer_inject.js"></script>
+    <script>
+        if (window.lucide) {
+            window.lucide.createIcons();
+        }
+
+        document.querySelectorAll('.upload-area[data-upload-input]').forEach((area) => {
+            const inputId = area.getAttribute('data-upload-input');
+            const input = inputId ? document.getElementById(inputId) : null;
+            if (!input) return;
+            area.addEventListener('click', () => input.click());
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

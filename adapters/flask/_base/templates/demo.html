@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}Tool Hub Soft UI Demo{% endblock %}
+{% block icon %}waves{% endblock %}
+{% block header %}Tool Hub Soft Demo{% endblock %}
+{% block subtitle %}A visual baseline and principles reference.{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="/static/demo.css">
+{% endblock %}
+
+{% block content %}
+<div class="panel">
+    <div class="demo-section">
+        <h3>Soft Code Principles</h3>
+        <p class="demo-lead">This program is built to keep software changeable and scalable.</p>
+        <div class="principles-grid">
+            <div class="principle-item">
+                <div class="principle-title">Decisions vs. Plumbing</div>
+                <div class="principle-body">Core logic stays pure. IO lives at the edges.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Plain Data Boundaries</div>
+                <div class="principle-body">Dataclasses carry meaning between layers.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Tests First</div>
+                <div class="principle-body">Tests are the first interface to decisions.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Dumb Orchestrator</div>
+                <div class="principle-body">Sequential flow, no embedded logic.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Side Effects at Edges</div>
+                <div class="principle-body">Adapters handle IO and frameworks.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Adapters Last</div>
+                <div class="principle-body">Build core first. UI and IO come after.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Add Files, Don’t Grow Them</div>
+                <div class="principle-body">Scale by adding modules, not bloating files.</div>
+            </div>
+            <div class="principle-item">
+                <div class="principle-title">Contracts Before Code</div>
+                <div class="principle-body">Define inputs and outputs before implementation.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>Primary Actions</h3>
+        <div class="u-flex u-gap-10">
+            <button class="btn btn-primary">Primary</button>
+            <button class="btn btn-secondary">Secondary</button>
+            <span class="demo-pill"><i data-lucide="sparkles"></i>Soft Code</span>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>Upload Area</h3>
+        {% set upload_id = 'demoUpload' %}
+        {% set input_id = 'demoInput' %}
+        {% set icon = 'file-text' %}
+        {% set title = 'Click to upload a file' %}
+        {% set hint = 'PDF, XLSX, or CSV' %}
+        {% set include_input = True %}
+        {% set input_accept = '.pdf,.xlsx,.csv' %}
+        {% include 'partials/upload_single.html' %}
+    </div>
+
+    <div class="demo-section">
+        <h3>Status + Alerts</h3>
+        <div class="demo-grid">
+            <div class="demo-alert info"><i data-lucide="info"></i>Info alert for neutral state.</div>
+            <div class="demo-alert success"><i data-lucide="check-circle"></i>Success alert for completed actions.</div>
+            <div class="demo-alert warning"><i data-lucide="alert-triangle"></i>Warning alert for attention.</div>
+            <div class="demo-alert error"><i data-lucide="x-circle"></i>Error alert for failed actions.</div>
+        </div>
+        <div class="u-mt-15">
+            <span class="demo-toast"><i data-lucide="bell"></i>Background task finished</span>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>Form States</h3>
+        <div class="demo-form-row">
+            <div>
+                <label class="form-label">Valid Input</label>
+                <input class="form-input demo-input success" value="Ready" />
+            </div>
+            <div>
+                <label class="form-label">Needs Attention</label>
+                <input class="form-input demo-input error" value="Check this" />
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>Tabs + Empty State</h3>
+        <div class="u-mb-12">
+            <div class="demo-tabs">
+                <button class="demo-tab active">Overview</button>
+                <button class="demo-tab">Details</button>
+                <button class="demo-tab">History</button>
+            </div>
+        </div>
+        <div class="demo-empty">
+            <i data-lucide="inbox"></i>
+            <div>No results yet. Add a tool to populate this area.</div>
+        </div>
+    </div>
+
+    <div class="demo-section">
+        <h3>Table</h3>
+        <table class="demo-table">
+            <thead>
+                <tr>
+                    <th>Tool</th>
+                    <th>Status</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>PDF Splitter</td>
+                    <td>Active</td>
+                    <td>Today</td>
+                </tr>
+                <tr>
+                    <td>Label Generator</td>
+                    <td>Backburner</td>
+                    <td>Yesterday</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="demo-footer">Use this table style for lists and summaries.</div>
+    </div>
+</div>
+{% endblock %}

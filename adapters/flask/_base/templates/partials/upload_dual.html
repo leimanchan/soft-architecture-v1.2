@@ -1,0 +1,28 @@
+<div class="upload-sections">
+    <div class="upload-section" id="{{ left_id }}">
+        <span class="upload-label">{{ left_label }}</span>
+        <div class="upload-icon"><i data-lucide="{{ left_icon }}"></i></div>
+        <div class="upload-text">{{ left_title }}</div>
+        <div class="upload-hint form-hint">{{ left_hint }}</div>
+        <div class="file-info" id="{{ left_info_id }}">
+            <div class="file-name" id="{{ left_name_id }}"></div>
+            <div class="file-size" id="{{ left_size_id }}"></div>
+        </div>
+    </div>
+
+    <div class="upload-section" id="{{ right_id }}">
+        <span class="upload-label">{{ right_label }}</span>
+        <div class="upload-icon"><i data-lucide="{{ right_icon }}"></i></div>
+        <div class="upload-text">{{ right_title }}</div>
+        <div class="upload-hint form-hint">{{ right_hint }}</div>
+        <div class="file-info" id="{{ right_info_id }}">
+            <div class="file-name" id="{{ right_name_id }}"></div>
+            <div class="file-size" id="{{ right_size_id }}"></div>
+        </div>
+    </div>
+</div>
+
+{% if include_inputs %}
+<input type="file" id="{{ left_input_id }}" class="file-input form-input" accept="{{ left_accept }}">
+<input type="file" id="{{ right_input_id }}" class="file-input form-input" accept="{{ right_accept }}">
+{% endif %}
