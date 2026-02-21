@@ -12,10 +12,10 @@ SCOPES = ("staged", "working-tree", "both")
 
 def _git_paths(root: Path, scope: str) -> list[str] | None:
     if scope == "staged":
-        cmd = ["git", "diff", "--cached", "--name-only", "-z"]
+        cmd = ["git", "diff", "--cached", "--name-only", "-z", "--diff-filter=ACMR"]
         skip_msg = "Adapter sequencing check skipped (not a git repo)."
     else:
-        cmd = ["git", "status", "--porcelain", "-z"]
+        cmd = ["git", "status", "--porcelain=v1", "-z"]
         skip_msg = "Adapter guard skipped (not a git repo)."
 
     result = subprocess.run(
@@ -32,7 +32,22 @@ def _git_paths(root: Path, scope: str) -> list[str] | None:
     entries = [e for e in result.stdout.split("\0") if e]
     if scope == "staged":
         return entries
-    return [entry[3:].strip() for entry in entries]
+
+    paths: list[str] = []
+    i = 0
+    while i < len(entries):
+        entry = entries[i]
+        if len(entry) >= 3:
+            status = entry[:2]
+            path_part = entry[3:]
+            if status.startswith("R") or status.startswith("C"):
+                if i + 1 < len(entries):
+                    paths.append(entries[i + 1])
+                    i += 2
+                    continue
+            paths.append(path_part.strip())
+        i += 1
+    return paths
 
 
 def _adapter_tools(paths: list[str]) -> set[str]:

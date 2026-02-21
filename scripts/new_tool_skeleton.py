@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 
@@ -15,9 +16,16 @@ def main() -> int:
         )
         return 1
 
-    tool_name = sys.argv[1].strip().lower().replace(" ", "_")
+    raw_name = sys.argv[1].strip()
+    tool_name = raw_name.lower().replace(" ", "_")
     if not tool_name:
         print("Tool name is required.")
+        return 1
+    if ".." in tool_name or "/" in tool_name or "\\" in tool_name:
+        print("Tool name must not contain path separators or '..'")
+        return 1
+    if not re.fullmatch(r"[a-z0-9_]+", tool_name):
+        print("Tool name must match [a-z0-9_]+")
         return 1
 
     args = sys.argv[2:]

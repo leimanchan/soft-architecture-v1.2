@@ -3,9 +3,8 @@
 
 from __future__ import annotations
 
-import importlib
+import ast
 import json
-import sys
 from pathlib import Path
 
 
@@ -61,13 +60,20 @@ def main() -> int:
                 errors.append(f"Tool '{name}' contracts path not found: {contracts}")
             else:
                 try:
-                    if str(root) not in sys.path:
-                        sys.path.insert(0, str(root))
-                    rel = contracts_path.relative_to(root).with_suffix("")
-                    module_path = ".".join(rel.parts)
-                    importlib.import_module(module_path)
+                    text = contracts_path.read_text(encoding="utf-8")
+                    tree = ast.parse(text)
+                    names = {
+                        node.name
+                        for node in ast.walk(tree)
+                        if isinstance(node, (ast.ClassDef, ast.FunctionDef))
+                    }
+                    missing = {"ToolInput", "ToolOutput", "run"} - names
+                    if missing:
+                        errors.append(
+                            f"Tool '{name}' contracts missing {', '.join(sorted(missing))}"
+                        )
                 except Exception as exc:
-                    errors.append(f"Tool '{name}' contracts import failed: {exc}")
+                    errors.append(f"Tool '{name}' contracts parse failed: {exc}")
 
     if errors:
         print("tools_registry.json validation failed:")
