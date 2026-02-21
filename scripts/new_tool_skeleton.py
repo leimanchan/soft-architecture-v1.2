@@ -9,7 +9,10 @@ from pathlib import Path
 
 def main() -> int:
     if len(sys.argv) < 2:
-        print("Usage: scripts/new_tool_skeleton.py <tool_name> [--register --description \"...\"]")
+        print(
+            "Usage: scripts/new_tool_skeleton.py <tool_name> "
+            "[--register --description \"...\"]"
+        )
         return 1
 
     tool_name = sys.argv[1].strip().lower().replace(" ", "_")
