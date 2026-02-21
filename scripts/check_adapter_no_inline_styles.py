@@ -20,7 +20,8 @@ def main() -> int:
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
         if "<style" in text:
-            violations.append(str(path))
+            if "inline-style:tool-specific" not in text:
+                violations.append(str(path))
 
     if violations:
         print("Inline <style> blocks found in templates:")

@@ -24,7 +24,12 @@ def main() -> int:
     tools = registry.get("tools", [])
     registered = {t.get("name") for t in tools if t.get("status") != "deprecated"}
 
+    core_tools = [d for d in core_dir.iterdir() if d.is_dir() and not d.name.startswith("_")]
+
     if not registered:
+        if core_tools:
+            print("Core tools exist but registry is empty.")
+            return 1
         print("No registered tools to check.")
         return 0
 

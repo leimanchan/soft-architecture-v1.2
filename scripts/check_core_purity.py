@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Fail if core imports adapter/framework packages."""
+"""Fail if core imports adapter/framework packages (AST-based)."""
 
 from __future__ import annotations
 
-import sys
+import ast
 from pathlib import Path
 
 FORBIDDEN_IMPORTS = {
@@ -24,14 +24,23 @@ def scan_file(path: Path) -> list[str]:
     except Exception:
         return violations
 
-    for i, line in enumerate(text.splitlines(), start=1):
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        if stripped.startswith("import ") or stripped.startswith("from "):
-            for forbidden in FORBIDDEN_IMPORTS:
-                if f"import {forbidden}" in stripped or f"from {forbidden}" in stripped:
-                    violations.append(f"{path}:{i}: forbidden import '{forbidden}'")
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return violations
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                root = alias.name.split(".")[0]
+                if root in FORBIDDEN_IMPORTS:
+                    violations.append(f"{path}:{node.lineno}: forbidden import '{root}'")
+        elif isinstance(node, ast.ImportFrom):
+            if node.module is None:
+                continue
+            root = node.module.split(".")[0]
+            if root in FORBIDDEN_IMPORTS:
+                violations.append(f"{path}:{node.lineno}: forbidden import '{root}'")
     return violations
 
 

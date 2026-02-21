@@ -25,3 +25,7 @@ This is the step-by-step, LLM-friendly build flow. Follow in order. Do not skip 
 - Step 4: `application/orchestrator.py`
 - Step 5: `adapters/<interface>/<tool>/...`
 - Step 6: run `scripts/check_core_purity.py` + tests
+
+## Skeleton Usage
+- Create core first: `scripts/new_tool_skeleton.py <tool_name>`
+- Add adapter later: `scripts/new_tool_skeleton.py <tool_name> --with-adapter`

@@ -40,6 +40,10 @@ scripts/
 - `scripts/new_tool_skeleton.py`
 - `scripts/check_core_purity.py`
 
+## Tool Creation
+- Core first: `scripts/new_tool_skeleton.py <tool_name>`
+- Adapter later: `scripts/new_tool_skeleton.py <tool_name> --with-adapter`
+
 ## Manifesto
 - `docs/manifesto/BUILDING_SOFTWARE_THAT_STAYS_SOFT.md`
 
@@ -63,6 +67,10 @@ Then open `http://localhost:8000`.
 - `scripts/check_adapter_uses_base.py`
 - `scripts/preflight.py`
 - `scripts/check_adapter_after_core.py`
+- `scripts/check_orchestrator_dumb.py`
+- `scripts/guard_adapters.py`
+- `scripts/check_orchestrator_dumb.py`
+- `scripts/guard_adapters.py`
 
 ## Agent Guidance
 - `AGENTS.md`

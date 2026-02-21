@@ -8,11 +8,12 @@ from pathlib import Path
 
 
 def main() -> int:
-    if len(sys.argv) != 2:
-        print("Usage: scripts/new_tool_skeleton.py <tool_name>")
+    if len(sys.argv) < 2:
+        print("Usage: scripts/new_tool_skeleton.py <tool_name> [--with-adapter]")
         return 1
 
     tool_name = sys.argv[1].strip().lower().replace(" ", "_")
+    with_adapter = "--with-adapter" in sys.argv[2:]
     if not tool_name:
         print("Tool name is required.")
         return 1
@@ -28,7 +29,7 @@ def main() -> int:
     flask_templates = flask_dir / "templates"
     flask_static = flask_dir / "static"
 
-    for d in [domain_dir, app_dir, tests_dir, flask_templates, flask_static]:
+    for d in [domain_dir, app_dir, tests_dir]:
         d.mkdir(parents=True, exist_ok=True)
 
     (core_dir / "__init__.py").touch(exist_ok=True)
@@ -63,10 +64,13 @@ def main() -> int:
         encoding="utf-8",
     )
 
-    (flask_dir / "app.py").write_text(
-        """#!/usr/bin/env python3\n\"\"\"Flask adapter.\"\"\"\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route('/')\ndef index():\n    return 'OK'\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=8000, debug=False)\n""",
-        encoding="utf-8",
-    )
+    if with_adapter:
+        for d in [flask_templates, flask_static]:
+            d.mkdir(parents=True, exist_ok=True)
+        (flask_dir / "app.py").write_text(
+            """#!/usr/bin/env python3\n\"\"\"Flask adapter.\"\"\"\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route('/')\ndef index():\n    return 'OK'\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=8000, debug=False)\n""",
+            encoding="utf-8",
+        )
 
     # Auto-register tool in tools_registry.json if present
     registry_path = root / "tools_registry.json"

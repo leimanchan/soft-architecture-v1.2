@@ -1,38 +1,46 @@
 #!/usr/bin/env python3
-"""Fail if core contains filesystem or process side effects."""
+"""Fail if core contains filesystem or process side effects (AST-based)."""
 
 from __future__ import annotations
 
+import ast
 from pathlib import Path
 
-FORBIDDEN_CALLS = [
-    "open(",
-    ".open(",
-    "read_text(",
-    "write_text(",
-    "mkdir(",
-    "rglob(",
-    "glob(",
-    "iterdir(",
-    "unlink(",
-    "rename(",
-    "replace(",
-    "rmdir(",
-    "chmod(",
-    "touch(",
-    "exists(",
-    "stat(",
-    "lstat(",
-    "walk(",
-    "listdir(",
-    "remove(",
-    "makedirs(",
-    "mkdtemp(",
-    "mkstemp(",
-    "Popen(",
-    "subprocess.",
-    "socket.",
-]
+FORBIDDEN_FUNCS = {
+    "open",
+}
+
+FORBIDDEN_MODULES = {
+    "os",
+    "pathlib",
+    "tempfile",
+    "subprocess",
+    "socket",
+    "shutil",
+}
+
+
+def _import_map(tree: ast.AST) -> dict[str, str]:
+    mapping: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                mapping[alias.asname or alias.name] = alias.name
+        elif isinstance(node, ast.ImportFrom):
+            if node.module is None:
+                continue
+            for alias in node.names:
+                mapping[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+    return mapping
+
+
+def _root_name(node: ast.AST) -> str | None:
+    current = node
+    while isinstance(current, ast.Attribute):
+        current = current.value
+    if isinstance(current, ast.Name):
+        return current.id
+    return None
 
 
 def scan_file(path: Path) -> list[str]:
@@ -41,14 +49,27 @@ def scan_file(path: Path) -> list[str]:
         text = path.read_text(encoding="utf-8")
     except Exception:
         return violations
+    try:
+        tree = ast.parse(text)
+    except SyntaxError:
+        return violations
 
-    for i, line in enumerate(text.splitlines(), start=1):
-        stripped = line.strip()
-        if not stripped or stripped.startswith("#"):
-            continue
-        for token in FORBIDDEN_CALLS:
-            if token in stripped:
-                violations.append(f"{path}:{i}: forbidden IO call '{token}'")
+    imports = _import_map(tree)
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name):
+                if func.id in FORBIDDEN_FUNCS:
+                    violations.append(f"{path}:{node.lineno}: forbidden IO call '{func.id}'")
+            elif isinstance(func, ast.Attribute):
+                root = _root_name(func)
+                if root in imports:
+                    module = imports[root].split(".")[0]
+                else:
+                    module = root
+                if module in FORBIDDEN_MODULES:
+                    violations.append(f"{path}:{node.lineno}: forbidden IO call '{module}'")
     return violations
 
 

@@ -16,6 +16,8 @@ CHECKS = [
     "scripts/check_adapter_no_inline_styles.py",
     "scripts/check_adapter_uses_base.py",
     "scripts/check_adapter_after_core.py",
+    "scripts/check_orchestrator_dumb.py",
+    "scripts/guard_adapters.py",
 ]
 
 

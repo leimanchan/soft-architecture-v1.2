@@ -18,6 +18,7 @@ Contents:
 Rules:
 - New Flask tools should extend `base.html` from this kit or copy it verbatim.
 - Do not add `<style>` blocks in tool templates. Put custom CSS in a tool-specific file under `static/<tool>/...`.
+- Inline `<style>` blocks are allowed only with the marker: `<!-- inline-style:tool-specific -->`.
 - Always include `/static/shared/style.css`.
 - Register the shared footer blueprint in your Flask app.
 - Use `templates/demo.html` as the visual reference. Update the base template/styles to change the look globally.

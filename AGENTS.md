@@ -35,7 +35,7 @@ scripts/
 - Application layer wires decisions together (no IO).
 - Orchestrator is dumb and sequential.
 - Adapters are the last step. Do not modify adapters until core artifacts exist.
-- Adapter templates must extend the base kit and never use inline `<style>` blocks. Inline styling is a last resort only for hyper tool-specific needs.
+- Adapter templates must extend the base kit and never use inline `<style>` blocks. Inline styling is a last resort only for hyper tool-specific needs and must include `<!-- inline-style:tool-specific -->`.
 
 ## Soft Code Workflow
 Follow `docs/soft/WORKFLOW.md` in order.
@@ -54,3 +54,4 @@ Follow `docs/soft/WORKFLOW.md` in order.
 ## Checks
 - `scripts/check_core_purity.py`
 - `scripts/soft_checkpoints.py <tool_name>`
+- `scripts/preflight.py`
