@@ -19,6 +19,8 @@ def _is_weak(text: str) -> bool:
             return True
     if "required fields" not in text.lower():
         return True
+    if "contracts_version" not in text.lower():
+        return True
     return False
 
 

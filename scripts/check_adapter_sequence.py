@@ -62,12 +62,17 @@ def _adapter_tools(paths: list[str]) -> set[str]:
 def _missing_core_artifacts(root: Path, tool: str) -> list[Path]:
     core_dir = root / "core" / tool
     required = [
+        core_dir / "__init__.py",
+        core_dir / "README.md",
         core_dir / "DECISIONS.md",
         core_dir / "domain" / "models.py",
         core_dir / "domain" / "specs.py",
+        core_dir / "domain" / "schema_checklist.md",
         core_dir / "contracts.py",
         core_dir / "application" / "service.py",
         core_dir / "application" / "orchestrator.py",
+        core_dir / "examples" / "happy_path.json",
+        core_dir / "examples" / "invalid_path.json",
     ]
     missing = [p for p in required if not p.exists()]
     tests_dir = core_dir / "tests"

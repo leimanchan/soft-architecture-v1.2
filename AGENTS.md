@@ -24,6 +24,7 @@ core/<tool>/
   DECISIONS.md                 <- Step 1: list every business decision
   contracts.py                 <- Step 2: ToolInput, ToolOutput, run()
   __init__.py                  <- Required for consistent imports
+  HUMAN_CHECKPOINTS.md         <- Mandatory human approvals at critical moments
   examples/                    <- Step 2: contract payload examples
     happy_path.json
     invalid_path.json
@@ -69,6 +70,7 @@ These are non-negotiable. Automated checks enforce them.
 | Adapter runtime dependencies must be declared | `check_runtime_dependencies.py` |
 | Adapter imports must be declared in requirements | `check_adapter_dependencies.py` |
 | Adapter smoke tests must pass (Flask) | `check_adapter_smoke.py` |
+| Human checkpoint file must exist for all tools; strict APPROVED gates are required for migrated tools | `check_human_checkpoints.py` |
 | Domain models are plain dataclasses — no methods with side effects | Convention |
 | Each tool must include __init__.py in core and adapters packages | Convention |
 | Adapters must only call core via contracts.run | Convention |
@@ -79,10 +81,15 @@ These are non-negotiable. Automated checks enforce them.
 Follow `docs/soft/WORKFLOW.md` in order. The steps are:
 
 1. **Decisions** — Write `core/<tool>/DECISIONS.md`. List every business decision the tool makes (not how, just what), plus a **Non-goals** section.
+   - **Human gate (migrated tools required):** update `HUMAN_CHECKPOINTS.md` → `CP1_DECISIONS` to `APPROVED` after human review.
 2. **Data Shapes** — Create `domain/models.py`, `domain/specs.py`, and `contracts.py`. Plain dataclasses only. Include a `contracts_version` string in ToolInput/ToolOutput and document it in `schema_checklist.md`.
+   - **Human gate (migrated tools required):** update `HUMAN_CHECKPOINTS.md` → `CP2_DATA_SHAPES` to `APPROVED` after human review.
 3. **Decision Functions** — Implement `application/service.py` and write tests. Pure functions, no I/O.
+   - **Human gate (migrated tools required):** run tests and update `HUMAN_CHECKPOINTS.md` → `CP3_CORE_TESTS` to `APPROVED`.
 4. **Orchestrator** — Write `application/orchestrator.py`. A dumb sequencer that calls your service functions in order. Max 60 lines, no branching.
+   - **Human gate (migrated tools required):** update `HUMAN_CHECKPOINTS.md` → `CP4_ORCHESTRATOR` to `APPROVED`.
 5. **Adapters** — NOW you can touch `adapters/`. Build Flask routes, templates, static files. Convert HTTP requests to domain objects, call core, convert back.
+   - **Human gate (migrated tools required when adapter exists):** update `HUMAN_CHECKPOINTS.md` → `CP5_ADAPTERS` to `APPROVED`.
 6. **Verification** — Run `scripts/preflight.py`. All checks must pass.
 
 For migrating existing tools, follow `docs/soft/MIGRATION_WORKFLOW.md` instead.

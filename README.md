@@ -26,7 +26,7 @@ When a user says "build me a tool that does X":
 2. **Scaffold** — run `scripts/new_tool_skeleton.py <tool_name>` to create the directory structure.
 3. **Follow the workflow** — work through `docs/soft/WORKFLOW.md` steps 1–6 in order. Each step produces concrete files that the next step depends on.
 4. **Validate** — run `scripts/preflight.py` before committing. All checks must pass.
-5. **Register** — the tool must appear in `tools_registry.json` with status, description, and contract path.
+5. **Register** — the tool must appear in `tools_registry.json` with `name`, `description`, `status`, `contracts`, `origin`, `path`, and `icon`.
 
 When a user says "migrate an existing tool":
 
@@ -42,8 +42,11 @@ When a user says "migrate an existing tool":
 ```
 core/                          <- Pure logic. No I/O. No frameworks.
   <tool>/
+    __init__.py                <- Required package marker
+    README.md                  <- Per-tool run/usage notes
+    HUMAN_CHECKPOINTS.md       <- Human approvals for critical workflow gates
     DECISIONS.md               <- What this tool decides (not how)
-    contracts.py               <- ToolInput, ToolOutput, run()
+    contracts.py               <- ToolInput, ToolOutput, run() + contracts_version
     examples/                  <- Example payloads
       happy_path.json
       invalid_path.json
@@ -61,12 +64,15 @@ adapters/                      <- I/O and frameworks live here.
   flask/
     _base/                     <- Shared UI kit (templates, styles, footer)
     <tool>/
+      __init__.py              <- Required package marker
       app.py                   <- Flask routes
       io.py                    <- Side effects only
       presenter.py             <- HTTP/template mapping only
       RUNTIME_DEPENDENCIES.md  <- Runtime libs + install command
+      assets/                  <- Tool-specific runtime assets
       templates/               <- HTML (must extend base.html)
       static/                  <- CSS (no inline styles)
+      tests/                   <- Adapter smoke tests
 
 scripts/                       <- Validation and scaffolding.
   preflight.py                 <- Master check (runs all validators)

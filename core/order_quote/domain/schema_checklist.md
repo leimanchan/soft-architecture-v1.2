@@ -1,15 +1,18 @@
 # Schema Checklist
 
 ## Required Fields
-- items: list
-- state: string (optional, defaults to "")
-- coupon_code: string or null (optional)
+- contracts_version: string ("1.0")
+- payload: object
+- payload.items: list
+- payload.state: string (optional, defaults to "")
+- payload.coupon_code: string or null (optional)
 
 ## Field Details
-- items[*].sku: non-empty string
-- items[*].quantity: int > 0
-- items[*].unit_price_cents: int >= 0
+- payload.items[*].sku: non-empty string
+- payload.items[*].quantity: int > 0
+- payload.items[*].unit_price_cents: int >= 0
 
 ## Defaults
-- state defaults to "" (no tax)
-- coupon_code defaults to null (no coupon)
+- contracts_version defaults to "1.0"
+- payload.state defaults to "" (no tax)
+- payload.coupon_code defaults to null (no coupon)

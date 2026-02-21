@@ -1,4 +1,5 @@
 {
+  "contracts_version": "1.0",
   "payload": {
     "hello": "world"
   }

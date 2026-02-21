@@ -26,6 +26,9 @@ def main() -> int:
     app = core / "application"
 
     required = [
+        core / "__init__.py",
+        core / "README.md",
+        core / "HUMAN_CHECKPOINTS.md",
         core / "DECISIONS.md",
         domain / "models.py",
         domain / "specs.py",

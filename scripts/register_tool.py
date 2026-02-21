@@ -36,6 +36,9 @@ def main() -> int:
         "description": description,
         "status": status,
         "contracts": f"core/{tool_name}/contracts.py",
+        "origin": "new",
+        "path": f"core/{tool_name}",
+        "icon": "tool",
     })
 
     registry["tools"] = tools

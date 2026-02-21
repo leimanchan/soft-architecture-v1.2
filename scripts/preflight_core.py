@@ -18,6 +18,8 @@ CHECKS = [
     "scripts/check_decisions_quality.py",
     "scripts/check_schema_checklist.py",
     "scripts/check_examples.py",
+    "scripts/check_human_checkpoints.py",
+    "scripts/check_tool_structure.py",
     "scripts/check_core_tests.py",
     "scripts/check_contracts.py",
     "scripts/check_test_coverage.py",

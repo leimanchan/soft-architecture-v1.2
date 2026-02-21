@@ -1,6 +1,7 @@
 # New Tool Checklist
 
 - Core logic exists under `core/<tool>/`.
+- `core/<tool>/HUMAN_CHECKPOINTS.md` exists and checkpoint statuses are approved.
 - Domain models are in `core/<tool>/domain/models.py`.
 - Constants/specs are in `core/<tool>/domain/specs.py`.
 - Schema checklist exists in `core/<tool>/domain/schema_checklist.md`.

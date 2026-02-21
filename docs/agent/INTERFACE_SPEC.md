@@ -7,6 +7,7 @@ Each tool exposes a `core/<tool>/contracts.py` with:
 - `ToolInput` dataclass
 - `ToolOutput` dataclass
 - `run(input: ToolInput) -> ToolOutput`
+- `contracts_version` string field on both `ToolInput` and `ToolOutput`
 
 ## Agent Call Pattern
 Agents should:
@@ -21,6 +22,9 @@ Each tool must be registered in `tools_registry.json` with:
 - `description`
 - `status`
 - `contracts` (path to contract file)
+- `origin` (`new` or `migrated`)
+- `path` (core folder path, e.g. `core/<tool>`)
+- `icon` (short icon label for UI/registry display)
 
 ## Status Values
 - `active`

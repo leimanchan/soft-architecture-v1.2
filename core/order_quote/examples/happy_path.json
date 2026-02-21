@@ -1,8 +1,11 @@
 {
-  "items": [
-    { "sku": "A", "quantity": 2, "unit_price_cents": 2500 },
-    { "sku": "B", "quantity": 1, "unit_price_cents": 1500 }
-  ],
-  "coupon_code": "save5",
-  "state": "ca"
+  "contracts_version": "1.0",
+  "payload": {
+    "items": [
+      { "sku": "A", "quantity": 2, "unit_price_cents": 2500 },
+      { "sku": "B", "quantity": 1, "unit_price_cents": 1500 }
+    ],
+    "coupon_code": "save5",
+    "state": "ca"
+  }
 }

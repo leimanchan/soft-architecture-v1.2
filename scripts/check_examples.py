@@ -26,9 +26,19 @@ def main() -> int:
                 failures.append(f"{tool_dir.name}: missing {path}")
                 continue
             try:
-                json.loads(path.read_text(encoding="utf-8"))
+                payload = json.loads(path.read_text(encoding="utf-8"))
             except Exception as exc:
                 failures.append(f"{tool_dir.name}: invalid JSON in {path} ({exc})")
+                continue
+
+            if not isinstance(payload, dict):
+                failures.append(f"{tool_dir.name}: {path.name} must be a JSON object")
+                continue
+            if "payload" not in payload:
+                failures.append(f"{tool_dir.name}: {path.name} missing 'payload'")
+            contracts_version = payload.get("contracts_version")
+            if not isinstance(contracts_version, str) or not contracts_version.strip():
+                failures.append(f"{tool_dir.name}: {path.name} missing non-empty 'contracts_version'")
 
     if failures:
         print("Examples check failed:")

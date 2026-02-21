@@ -19,3 +19,8 @@ def test_run_rejects_negative_unit_price():
     }
     with pytest.raises(ValueError):
         run(ToolInput(payload=payload))
+
+
+def test_run_rejects_unsupported_contracts_version():
+    with pytest.raises(ValueError):
+        run(ToolInput(payload={"items": []}, contracts_version="9.9"))
