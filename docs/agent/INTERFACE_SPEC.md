@@ -12,7 +12,8 @@ Each tool exposes a `core/<tool>/contracts.py` with:
 Agents should:
 1. Read `core/<tool>/DECISIONS.md`
 2. Read `core/<tool>/contracts.py`
-3. Call the adapter, or call `run()` in core if available
+3. Review `core/<tool>/examples/happy_path.json` and `invalid_path.json`
+4. Call the adapter, or call `run()` in core if available
 
 ## Required Registry Entry
 Each tool must be registered in `tools_registry.json` with:

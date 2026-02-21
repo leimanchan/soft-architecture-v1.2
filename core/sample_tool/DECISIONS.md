@@ -12,5 +12,9 @@
 - Happy path: return {"echo": payload}.
 - Error: payload must be a dict, otherwise raise ValueError.
 
+## Non-goals
+- No data validation beyond simple type checks.
+- No persistence, file IO, or external integration.
+
 ## Notes
 - This tool is intentionally simple and meant for testing the workflow.

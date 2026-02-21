@@ -23,16 +23,24 @@ Every tool you build produces this file tree:
 core/<tool>/
   DECISIONS.md                 <- Step 1: list every business decision
   contracts.py                 <- Step 2: ToolInput, ToolOutput, run()
+  examples/                    <- Step 2: contract payload examples
+    happy_path.json
+    invalid_path.json
   domain/
     models.py                  <- Step 2: plain dataclasses
     specs.py                   <- Step 2: constants and specifications
+    schema_checklist.md        <- Step 2: required keys/types/defaults
   application/
     service.py                 <- Step 3: pure decision functions
     orchestrator.py            <- Step 4: dumb sequencer (max 60 lines)
   tests/                       <- Step 3: unit tests (no I/O)
+  MIGRATION_MAP.md             <- Migration only: old -> new mapping
 
 adapters/flask/<tool>/         <- Step 5: built LAST, after core is complete
   app.py
+  io.py                        <- side effects only
+  presenter.py                 <- HTTP/template mapping only
+  RUNTIME_DEPENDENCIES.md       <- adapter runtime libs + install command
   templates/
   static/
 ```
@@ -50,6 +58,12 @@ These are non-negotiable. Automated checks enforce them.
 | Templates must extend `base.html` from the shared UI kit | `check_adapter_uses_base.py` |
 | Templates must NOT contain inline `<style>` blocks | `check_adapter_no_inline_styles.py` |
 | All registered tools must have tests | `check_core_tests.py` |
+| Tool examples must exist and be valid JSON | `check_examples.py` |
+| Schema checklist must exist | `check_schema_checklist.py` |
+| Migrated tools must include MIGRATION_MAP.md | `check_migration_map.py` |
+| Adapter runtime dependencies must be declared | `check_runtime_dependencies.py` |
+| Adapter imports must be declared in requirements | `check_adapter_dependencies.py` |
+| Adapter smoke tests must pass (Flask) | `check_adapter_smoke.py` |
 | Domain models are plain dataclasses — no methods with side effects | Convention |
 
 ## Workflow

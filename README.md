@@ -44,19 +44,27 @@ core/                          <- Pure logic. No I/O. No frameworks.
   <tool>/
     DECISIONS.md               <- What this tool decides (not how)
     contracts.py               <- ToolInput, ToolOutput, run()
+    examples/                  <- Example payloads
+      happy_path.json
+      invalid_path.json
     domain/
       models.py                <- Plain dataclasses
       specs.py                 <- Constants and specifications
+      schema_checklist.md      <- Required keys/types/defaults
     application/
       service.py               <- Pure decision functions
       orchestrator.py          <- Dumb sequencer (max 60 lines, no branching)
     tests/                     <- Unit tests (no I/O needed)
+    MIGRATION_MAP.md           <- Migration only: old -> new mapping
 
 adapters/                      <- I/O and frameworks live here.
   flask/
     _base/                     <- Shared UI kit (templates, styles, footer)
     <tool>/
       app.py                   <- Flask routes
+      io.py                    <- Side effects only
+      presenter.py             <- HTTP/template mapping only
+      RUNTIME_DEPENDENCIES.md  <- Runtime libs + install command
       templates/               <- HTML (must extend base.html)
       static/                  <- CSS (no inline styles)
 

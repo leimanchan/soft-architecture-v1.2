@@ -19,12 +19,12 @@ This is the step-by-step, LLM-friendly build flow. Follow in order. Do not skip 
 - Preflight checks must pass before moving on.
 
 ## Artifacts by Step
-- Step 1: `DECISIONS.md` in tool folder
-- Step 2: `domain/models.py`, `domain/specs.py`, `contracts.py`
+- Step 1: `DECISIONS.md` in tool folder (include **Non-goals**)
+- Step 2: `domain/models.py`, `domain/specs.py`, `domain/schema_checklist.md`, `contracts.py`, `examples/*.json`
 - Step 3: `application/service.py` + tests
 - Step 4: `application/orchestrator.py`
-- Step 5: `adapters/<interface>/<tool>/...`
-- Step 6: run `scripts/check_core_purity.py` + tests
+- Step 5: `adapters/<interface>/<tool>/...` + `io.py` + `presenter.py` + `RUNTIME_DEPENDENCIES.md`
+- Step 6: run `scripts/preflight.py` (includes adapter smoke + dependency checks)
 
 ## Skeleton Usage
 - Create core first: `scripts/new_tool_skeleton.py <tool_name>`

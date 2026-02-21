@@ -5,13 +5,15 @@
       "name": "sample_tool",
       "description": "Minimal sample tool for validating the workflow",
       "status": "active",
-      "contracts": "core/sample_tool/contracts.py"
+      "contracts": "core/sample_tool/contracts.py",
+      "origin": "new"
     },
     {
       "name": "order_quote",
       "description": "Reference pricing tool that computes deterministic order quotes from item rows",
       "status": "active",
-      "contracts": "core/order_quote/contracts.py"
+      "contracts": "core/order_quote/contracts.py",
+      "origin": "new"
     }
   ]
 }

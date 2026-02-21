@@ -19,3 +19,8 @@
 - The contract always returns a stable dictionary shape with normalized items and totals.
 - Unknown coupon codes are ignored (treated as zero discount) rather than crashing.
 - The orchestrator remains a thin sequence: parse, compute, serialize.
+
+## Non-goals
+- No currency conversion or localization.
+- No external tax services or dynamic shipping rates.
+- No persistence of quotes or order history.

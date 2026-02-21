@@ -30,9 +30,13 @@ def main() -> int:
         core / "DECISIONS.md",
         domain / "models.py",
         domain / "specs.py",
+        domain / "schema_checklist.md",
         app / "service.py",
         app / "orchestrator.py",
         contracts,
+        core / "examples" / "happy_path.json",
+        core / "examples" / "invalid_path.json",
+        core / "MIGRATION_MAP.md",
     ]
 
     missing = [path for path in required if not path.exists()]

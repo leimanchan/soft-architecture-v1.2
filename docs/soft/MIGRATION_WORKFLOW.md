@@ -12,7 +12,9 @@ Use this when converting an existing program into the Soft Code structure.
 5. Refactor adapters: move IO/framework code under `adapters/<interface>/<tool>/`.
 6. Add contracts: `core/<tool>/contracts.py`.
 7. Add tests: decision logic only.
-8. Register tool: update `tools_registry.json`.
+8. Add examples: `core/<tool>/examples/happy_path.json` and `invalid_path.json`.
+9. Add migration map: `core/<tool>/MIGRATION_MAP.md`.
+10. Register tool: update `tools_registry.json` (origin: migrated).
 
 ## Output
 - Decision logic lives in core

@@ -6,6 +6,7 @@ Goal: Identify all *decisions* this tool makes. No plumbing.
 Create `core/<tool>/DECISIONS.md` with:
 - A short summary of the tool
 - A bullet list of decisions (pure logic)
+- A **Non-goals** section (what this tool will NOT do)
 
 ## Rules
 - No mention of file formats, databases, or frameworks.

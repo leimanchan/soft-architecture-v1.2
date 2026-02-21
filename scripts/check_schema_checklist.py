@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Fail if DECISIONS.md is missing or too weak."""
+"""Ensure schema_checklist.md exists and is non-trivial for each tool."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
-MIN_LINES = 5
+MIN_LINES = 4
 FORBIDDEN_MARKERS = {"todo", "tbd", "fixme"}
 
 
@@ -13,12 +13,12 @@ def _is_weak(text: str) -> bool:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     if len(lines) < MIN_LINES:
         return True
-    if "## non-goals" not in text.lower():
-        return True
     for line in lines:
         lower = line.lower()
         if any(marker in lower for marker in FORBIDDEN_MARKERS):
             return True
+    if "required fields" not in text.lower():
+        return True
     return False
 
 
@@ -33,23 +33,21 @@ def main() -> int:
     for tool_dir in core_dir.iterdir():
         if not tool_dir.is_dir() or tool_dir.name.startswith("_"):
             continue
-        decisions = tool_dir / "DECISIONS.md"
-        if not decisions.exists():
-            failures.append(f"{tool_dir.name}: DECISIONS.md missing")
+        path = tool_dir / "domain" / "schema_checklist.md"
+        if not path.exists():
+            failures.append(f"{tool_dir.name}: domain/schema_checklist.md missing")
             continue
-        text = decisions.read_text(encoding="utf-8")
+        text = path.read_text(encoding="utf-8")
         if _is_weak(text):
-            failures.append(
-                f"{tool_dir.name}: DECISIONS.md too short or contains placeholders (add real decisions)"
-            )
+            failures.append(f"{tool_dir.name}: schema_checklist.md is too short or TODO")
 
     if failures:
-        print("Decisions quality check failed:")
+        print("Schema checklist check failed:")
         for msg in failures:
             print(f"- {msg}")
         return 1
 
-    print("Decisions quality check passed.")
+    print("Schema checklist check passed.")
     return 0
 
 

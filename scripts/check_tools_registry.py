@@ -38,6 +38,7 @@ def main() -> int:
         status = tool.get("status")
         contracts = tool.get("contracts")
         tombstone = tool.get("tombstone")
+        origin = tool.get("origin")
         if not name:
             errors.append("Tool missing 'name'")
         elif name in seen_names:
@@ -50,6 +51,8 @@ def main() -> int:
             errors.append(f"Tool '{name}' description is TODO")
         if status not in {"active", "backburner", "deprecated"}:
             errors.append(f"Tool '{name}' invalid status '{status}'")
+        if origin not in {"new", "migrated"}:
+            errors.append(f"Tool '{name}' invalid origin '{origin}'")
         if not contracts:
             errors.append(f"Tool '{name}' missing 'contracts'")
         else:

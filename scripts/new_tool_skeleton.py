@@ -42,8 +42,9 @@ def main() -> int:
     domain_dir = core_dir / "domain"
     app_dir = core_dir / "application"
     tests_dir = core_dir / "tests"
+    examples_dir = core_dir / "examples"
 
-    for d in [domain_dir, app_dir, tests_dir]:
+    for d in [domain_dir, app_dir, tests_dir, examples_dir]:
         d.mkdir(parents=True, exist_ok=True)
 
     (core_dir / "__init__.py").touch(exist_ok=True)
@@ -66,6 +67,10 @@ def main() -> int:
 - Known edge cases.
 - Error/validation rules.
 
+## Non-goals
+- What this tool explicitly will not do.
+- What is out of scope for this tool.
+
 ## Notes
 - Dependencies (if any).
 - Future changes or open questions.
@@ -80,6 +85,23 @@ def main() -> int:
 
     (domain_dir / "specs.py").write_text(
         """\"\"\"Domain specs/constants.\"\"\"\n\n""",
+        encoding="utf-8",
+    )
+
+    (domain_dir / "schema_checklist.md").write_text(
+        """# Schema Checklist
+
+Document the required keys, types, and defaults for any nested config in your payload.
+
+## Required Fields
+- payload: dict
+
+## Field Details
+- payload: object with tool-specific keys (define below)
+
+## Defaults
+- None (list defaults if applicable)
+""",
         encoding="utf-8",
     )
 
@@ -108,6 +130,16 @@ def main() -> int:
         encoding="utf-8",
     )
 
+    (examples_dir / "happy_path.json").write_text(
+        "{\n  \"payload\": {\"hello\": \"world\"}\n}\n",
+        encoding="utf-8",
+    )
+
+    (examples_dir / "invalid_path.json").write_text(
+        "{\n  \"payload\": \"not-a-dict\"\n}\n",
+        encoding="utf-8",
+    )
+
     if register:
         if not description:
             print("--register requires --description")
@@ -123,6 +155,7 @@ def main() -> int:
                     "description": description,
                     "status": "active",
                     "contracts": f"core/{tool_name}/contracts.py",
+                    "origin": "new",
                 })
                 registry["tools"] = tools
                 registry_path.write_text(json.dumps(registry, indent=2), encoding="utf-8")
