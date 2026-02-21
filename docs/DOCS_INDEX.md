@@ -15,3 +15,4 @@
 - `docs/soft/06_verification.md`: Step 6.
 - `docs/soft/MIGRATION_WORKFLOW.md`: existing tool migration flow.
 - `docs/manifesto/BUILDING_SOFTWARE_THAT_STAYS_SOFT.md`: manifesto.
+- `START_HERE.md`: entry point.

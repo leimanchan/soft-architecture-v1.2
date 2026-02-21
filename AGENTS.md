@@ -2,6 +2,8 @@
 
 **You are an LLM agent. This file is your rulebook.** Every tool you create or migrate in this repo MUST follow the structure, workflow, and constraints below. These rules are enforced by automated checks — violations will be caught.
 
+Start here: `START_HERE.md`
+
 ## Your Job
 
 A user will ask you to build a tool (e.g., "build me a label printer" or "migrate my PDF splitter"). Your job is to produce working code that follows the Soft Code architecture. This means:

@@ -2,6 +2,8 @@
 
 **This repo is not an application. You do not run it.** It is an instruction set and enforcement framework for LLM agents. When a user asks you to build or migrate a tool, this repo tells you exactly how — what files to create, what rules to follow, what checks to pass.
 
+Start here: `START_HERE.md`
+
 Read `AGENTS.md` first. That is your rulebook.
 
 ## What This Repo Contains
