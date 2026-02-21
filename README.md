@@ -135,4 +135,5 @@ python3 adapters/flask/_base/demo_app.py
 Then open `http://localhost:8000`.
 
 By default, demo startup is gated by `scripts/preflight_core.py` and will fail fast if checks do not pass.
+Set `RUNTIME_GATE_FULL_REPORT=1` to run all checks before exit and get full diagnostics in one pass.
 When blocked, a JSON report is written under `.reports/`.

@@ -8,6 +8,7 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
+
 def _python_cmd(root: Path) -> list[str]:
     override = os.environ.get("PYTHON_EXECUTABLE")
     if override:
@@ -25,6 +26,11 @@ def _clear_coverage_artifacts(root: Path) -> None:
             path.unlink()
 
 
+def _env_truthy(name: str) -> bool:
+    value = os.environ.get(name, "").strip().lower()
+    return value in {"1", "true", "yes", "on"}
+
+
 def enforce_preflight(mode: str = "core") -> int:
     root = Path(__file__).resolve().parents[1]
     python_cmd = _python_cmd(root)
@@ -38,7 +44,10 @@ def enforce_preflight(mode: str = "core") -> int:
         script = root / "scripts" / "preflight.py"
     else:
         script = root / "scripts" / "preflight_core.py"
-    cmd = python_cmd + [str(script), "--full-report", "--report-json", str(report_path)]
+    cmd = python_cmd + [str(script), "--report-json", str(report_path)]
+    # Fail fast by default; opt into full-report mode when explicitly requested.
+    if _env_truthy("RUNTIME_GATE_FULL_REPORT"):
+        cmd.append("--full-report")
 
     print(f"Enforcing preflight gate ({mode}) before runtime start...")
     result = subprocess.run(cmd, cwd=str(root), env=os.environ.copy(), check=False)

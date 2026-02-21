@@ -45,8 +45,8 @@ def _split_lines(text: str) -> list[str]:
 def _changed_files_local(root: Path) -> list[str]:
     changed: set[str] = set()
     commands = [
-        ["diff", "--name-only", "--diff-filter=ACMR"],
-        ["diff", "--cached", "--name-only", "--diff-filter=ACMR"],
+        ["diff", "--name-only", "--diff-filter=ACMRD"],
+        ["diff", "--cached", "--name-only", "--diff-filter=ACMRD"],
         ["ls-files", "--others", "--exclude-standard"],
     ]
     for args in commands:
@@ -62,12 +62,12 @@ def _changed_files_ci(root: Path) -> list[str] | None:
 
     if base_ref:
         _run_git(root, ["fetch", "origin", base_ref, "--depth=1"])
-        code, output = _run_git(root, ["diff", "--name-only", f"origin/{base_ref}...HEAD", "--diff-filter=ACMR"])
+        code, output = _run_git(root, ["diff", "--name-only", f"origin/{base_ref}...HEAD", "--diff-filter=ACMRD"])
         if code == 0:
             return sorted(set(_split_lines(output)))
 
     if before_sha and before_sha != "0" * 40:
-        code, output = _run_git(root, ["diff", "--name-only", f"{before_sha}...HEAD", "--diff-filter=ACMR"])
+        code, output = _run_git(root, ["diff", "--name-only", f"{before_sha}...HEAD", "--diff-filter=ACMRD"])
         if code == 0:
             return sorted(set(_split_lines(output)))
 
