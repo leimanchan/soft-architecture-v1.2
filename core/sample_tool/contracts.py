@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Any
 
+from core.sample_tool.application.orchestrator import run as orchestrate
+
 
 @dataclass
 class ToolInput:
@@ -18,4 +20,4 @@ class ToolOutput:
 
 def run(input_data: ToolInput) -> ToolOutput:
     """Pure contract entrypoint."""
-    return ToolOutput(result={"echo": input_data.payload})
+    return ToolOutput(result=orchestrate(input_data.payload))

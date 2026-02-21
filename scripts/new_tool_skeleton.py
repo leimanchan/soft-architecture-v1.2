@@ -53,7 +53,7 @@ def main() -> int:
     )
 
     (core_dir / "contracts.py").write_text(
-        """\"\"\"Tool contract.\"\"\"\n\n""",
+        """\"\"\"Tool contract.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Dict, Any\n\n\n@dataclass\nclass ToolInput:\n    payload: Dict[str, Any]\n\n\n@dataclass\nclass ToolOutput:\n    result: Dict[str, Any]\n\n\ndef run(input_data: ToolInput) -> ToolOutput:\n    return ToolOutput(result={})\n""",
         encoding="utf-8",
     )
 

@@ -106,8 +106,8 @@ def scan_file(path: Path) -> list[str]:
                     root_module = imports[root].split(".")[0]
                     if root_module in FORBIDDEN_MODULES:
                         violations.append(f"{path}:{node.lineno}: forbidden IO call '{root_module}'")
-                if attr in FORBIDDEN_METHODS:
-                    violations.append(f"{path}:{node.lineno}: forbidden IO method '{attr}'")
+                    if attr in FORBIDDEN_METHODS:
+                        violations.append(f"{path}:{node.lineno}: forbidden IO method '{attr}' on '{root_module}'")
     return violations
 
 

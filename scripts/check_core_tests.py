@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ensure each tool has at least one decision test and registry matches core."""
+"""Ensure each tool has meaningful tests and registry matches core."""
 
 from __future__ import annotations
 
@@ -8,7 +8,7 @@ import json
 from pathlib import Path
 
 
-def _has_test_calls(path: Path) -> bool:
+def _test_has_asserts(path: Path) -> bool:
     try:
         text = path.read_text(encoding="utf-8")
         tree = ast.parse(text)
@@ -16,8 +16,12 @@ def _has_test_calls(path: Path) -> bool:
         return False
 
     for node in ast.walk(tree):
-        if isinstance(node, ast.Call):
+        if isinstance(node, ast.Assert):
             return True
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Attribute):
+                if node.func.attr == "raises":
+                    return True
     return False
 
 
@@ -68,8 +72,8 @@ def main() -> int:
         if not test_files:
             failures.append(f"{tool_name}: no test_*.py files in tests/")
             continue
-        if not any(_has_test_calls(p) for p in test_files):
-            failures.append(f"{tool_name}: tests contain no calls")
+        if not any(_test_has_asserts(p) for p in test_files):
+            failures.append(f"{tool_name}: tests contain no asserts/raises")
 
     if failures:
         print("Core tests check failed:")

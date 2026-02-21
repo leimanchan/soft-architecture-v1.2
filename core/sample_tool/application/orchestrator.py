@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 from core.sample_tool.application import service
-from core.sample_tool.contracts import ToolInput, ToolOutput
 
 
-def run(payload: ToolInput) -> ToolOutput:
-    return ToolOutput(result=service.echo(payload.payload))
+def run(payload: dict) -> dict:
+    return service.echo(payload)
