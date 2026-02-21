@@ -44,7 +44,7 @@ These are non-negotiable. Automated checks enforce them.
 | Rule | Enforced By |
 |------|-------------|
 | Core must NEVER import Flask, FastAPI, Django, Click, Typer, requests, or adapters | `check_core_purity.py` |
-| Core must NEVER use open(), os, pathlib, subprocess, socket, shutil, or any I/O | `check_core_no_io.py` |
+| Core must NEVER use open(), os, pathlib, tempfile, subprocess, socket, shutil, or any I/O | `check_core_no_io.py` |
 | Orchestrators must be <=60 lines with NO branching (no if/for/while/try/with/match) | `check_orchestrator_dumb.py` |
 | Adapters must NOT be modified until core artifacts exist | `check_adapter_after_core.py` |
 | Templates must extend `base.html` from the shared UI kit | `check_adapter_uses_base.py` |

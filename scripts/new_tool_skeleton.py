@@ -9,7 +9,7 @@ from pathlib import Path
 
 def main() -> int:
     if len(sys.argv) < 2:
-        print("Usage: scripts/new_tool_skeleton.py <tool_name> [--with-adapter] [--register --description \"...\"]")
+        print("Usage: scripts/new_tool_skeleton.py <tool_name> [--register --description \"...\"]")
         return 1
 
     tool_name = sys.argv[1].strip().lower().replace(" ", "_")
@@ -18,7 +18,6 @@ def main() -> int:
         return 1
 
     args = sys.argv[2:]
-    with_adapter = "--with-adapter" in args
     register = "--register" in args
     description = None
     if "--description" in args:
@@ -32,10 +31,6 @@ def main() -> int:
     domain_dir = core_dir / "domain"
     app_dir = core_dir / "application"
     tests_dir = core_dir / "tests"
-
-    flask_dir = root / "adapters" / "flask" / tool_name
-    flask_templates = flask_dir / "templates"
-    flask_static = flask_dir / "static"
 
     for d in [domain_dir, app_dir, tests_dir]:
         d.mkdir(parents=True, exist_ok=True)
@@ -71,14 +66,6 @@ def main() -> int:
         """\"\"\"Dumb orchestrator.\"\"\"\n\n""",
         encoding="utf-8",
     )
-
-    if with_adapter:
-        for d in [flask_templates, flask_static]:
-            d.mkdir(parents=True, exist_ok=True)
-        (flask_dir / "app.py").write_text(
-            """#!/usr/bin/env python3\n\"\"\"Flask adapter.\"\"\"\n\nfrom flask import Flask\n\napp = Flask(__name__)\n\n@app.route('/')\ndef index():\n    return 'OK'\n\nif __name__ == '__main__':\n    app.run(host='0.0.0.0', port=8000, debug=False)\n""",
-            encoding="utf-8",
-        )
 
     if register:
         if not description:

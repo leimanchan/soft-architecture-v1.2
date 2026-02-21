@@ -6,12 +6,6 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-FORBIDDEN_FUNCS = {
-    "open",
-    "system",
-    "popen",
-}
-
 FORBIDDEN_MODULES = {
     "os",
     "pathlib",
@@ -19,6 +13,12 @@ FORBIDDEN_MODULES = {
     "subprocess",
     "socket",
     "shutil",
+}
+
+FORBIDDEN_FUNCS = {
+    "open",
+    "system",
+    "popen",
 }
 
 FORBIDDEN_METHODS = {
@@ -83,6 +83,11 @@ def scan_file(path: Path) -> list[str]:
 
     imports = _import_map(tree)
 
+    # Fail on forbidden imports directly
+    for name, module in imports.items():
+        if module.split(".")[0] in FORBIDDEN_MODULES:
+            violations.append(f"{path}: forbidden import '{module}'")
+
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
             func = node.func
@@ -90,7 +95,6 @@ def scan_file(path: Path) -> list[str]:
                 name = func.id
                 if name in FORBIDDEN_FUNCS:
                     violations.append(f"{path}:{node.lineno}: forbidden IO call '{name}'")
-                # detect imported functions like: from os import system
                 if name in imports:
                     root_module = imports[name].split(".")[0]
                     if root_module in FORBIDDEN_MODULES:
@@ -98,12 +102,12 @@ def scan_file(path: Path) -> list[str]:
             elif isinstance(func, ast.Attribute):
                 root = _root_name(func)
                 attr = func.attr
-                if attr in FORBIDDEN_METHODS:
-                    violations.append(f"{path}:{node.lineno}: forbidden IO method '{attr}'")
                 if root in imports:
                     root_module = imports[root].split(".")[0]
                     if root_module in FORBIDDEN_MODULES:
                         violations.append(f"{path}:{node.lineno}: forbidden IO call '{root_module}'")
+                if attr in FORBIDDEN_METHODS:
+                    violations.append(f"{path}:{node.lineno}: forbidden IO method '{attr}'")
     return violations
 
 

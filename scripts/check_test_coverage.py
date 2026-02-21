@@ -8,7 +8,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-MIN_COVERAGE = 25
+DEFAULT_MIN = 50
 
 
 def _python_cmd(root: Path) -> list[str]:
@@ -22,12 +22,13 @@ def main() -> int:
     root = Path(__file__).resolve().parents[1]
     env = os.environ.copy()
     env["PYTHONPATH"] = str(root)
+    min_cov = int(env.get("MIN_COVERAGE", DEFAULT_MIN))
     cmd = _python_cmd(root) + [
         "-m",
         "pytest",
         "--cov=core",
         "--cov-report=term-missing",
-        f"--cov-fail-under={MIN_COVERAGE}",
+        f"--cov-fail-under={min_cov}",
     ]
     result = subprocess.run(cmd, cwd=str(root), env=env)
     return result.returncode

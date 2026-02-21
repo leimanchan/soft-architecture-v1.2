@@ -3,8 +3,22 @@
 
 from __future__ import annotations
 
+import ast
 import json
 from pathlib import Path
+
+
+def _has_test_calls(path: Path) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8")
+        tree = ast.parse(text)
+    except Exception:
+        return False
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            return True
+    return False
 
 
 def main() -> int:
@@ -53,6 +67,9 @@ def main() -> int:
         test_files = list(tests_dir.glob("test_*.py"))
         if not test_files:
             failures.append(f"{tool_name}: no test_*.py files in tests/")
+            continue
+        if not any(_has_test_calls(p) for p in test_files):
+            failures.append(f"{tool_name}: tests contain no calls")
 
     if failures:
         print("Core tests check failed:")
