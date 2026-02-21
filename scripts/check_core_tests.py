@@ -19,9 +19,49 @@ def _test_has_asserts(path: Path) -> bool:
         if isinstance(node, ast.Assert):
             return True
         if isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Attribute):
-                if node.func.attr == "raises":
-                    return True
+            if isinstance(node.func, ast.Attribute) and node.func.attr == "raises":
+                return True
+    return False
+
+
+def _test_calls_run(path: Path) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8")
+        tree = ast.parse(text)
+    except Exception:
+        return False
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Call):
+            func = node.func
+            if isinstance(func, ast.Name) and func.id == "run":
+                return True
+            if isinstance(func, ast.Attribute) and func.attr == "run":
+                return True
+    return False
+
+
+def _test_has_nontrivial_assert(path: Path) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8")
+        tree = ast.parse(text)
+    except Exception:
+        return False
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assert):
+            # Reject trivial asserts like "assert True" or "assert __doc__"
+            test = node.test
+            if isinstance(test, ast.Constant) and test.value is True:
+                continue
+            if isinstance(test, ast.Attribute) and test.attr == "__doc__":
+                continue
+            if isinstance(test, ast.Name) and test.id == "__doc__":
+                continue
+            if isinstance(test, ast.Call):
+                if isinstance(test.func, ast.Name) and test.func.id == "hasattr":
+                    continue
+            return True
     return False
 
 
@@ -74,6 +114,12 @@ def main() -> int:
             continue
         if not any(_test_has_asserts(p) for p in test_files):
             failures.append(f"{tool_name}: tests contain no asserts/raises")
+            continue
+        if not any(_test_has_nontrivial_assert(p) for p in test_files):
+            failures.append(f"{tool_name}: tests only contain trivial asserts")
+            continue
+        if not any(_test_calls_run(p) for p in test_files):
+            failures.append(f"{tool_name}: tests do not call run()")
 
     if failures:
         print("Core tests check failed:")

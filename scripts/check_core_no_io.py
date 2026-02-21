@@ -13,12 +13,21 @@ FORBIDDEN_MODULES = {
     "subprocess",
     "socket",
     "shutil",
+    "glob",
+    "ftplib",
+    "imaplib",
+    "poplib",
+    "smtplib",
+    "telnetlib",
+    "urllib",
+    "http",
 }
 
 FORBIDDEN_FUNCS = {
     "open",
     "system",
     "popen",
+    "__import__",
 }
 
 FORBIDDEN_METHODS = {
@@ -44,6 +53,8 @@ FORBIDDEN_METHODS = {
     "makedirs",
     "mkdtemp",
     "mkstemp",
+    "getenv",
+    "import_module",
 }
 
 
@@ -102,6 +113,12 @@ def scan_file(path: Path) -> list[str]:
             elif isinstance(func, ast.Attribute):
                 root = _root_name(func)
                 attr = func.attr
+                if (
+                    isinstance(func.value, ast.Name)
+                    and func.value.id == "importlib"
+                    and attr == "import_module"
+                ):
+                    violations.append(f"{path}:{node.lineno}: forbidden dynamic import 'importlib.import_module'")
                 if root in imports:
                     root_module = imports[root].split(".")[0]
                     if root_module in FORBIDDEN_MODULES:

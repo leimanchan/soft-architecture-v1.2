@@ -13,6 +13,13 @@ FORBIDDEN_IMPORTS = {
     "click",
     "typer",
     "requests",
+    "httpx",
+    "aiohttp",
+    "urllib3",
+    "boto3",
+    "sqlalchemy",
+    "pydantic",
+    "streamlit",
     "adapters",
 }
 
@@ -41,6 +48,18 @@ def scan_file(path: Path) -> list[str]:
             root = node.module.split(".")[0]
             if root in FORBIDDEN_IMPORTS:
                 violations.append(f"{path}:{node.lineno}: forbidden import '{root}'")
+        elif isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Name) and node.func.id == "__import__":
+                violations.append(f"{path}:{node.lineno}: dynamic import '__import__' not allowed")
+            if isinstance(node.func, ast.Attribute):
+                if (
+                    isinstance(node.func.value, ast.Name)
+                    and node.func.value.id == "importlib"
+                    and node.func.attr == "import_module"
+                ):
+                    violations.append(
+                        f"{path}:{node.lineno}: dynamic import 'importlib.import_module' not allowed"
+                    )
     return violations
 
 

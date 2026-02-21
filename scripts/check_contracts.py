@@ -1,10 +1,43 @@
 #!/usr/bin/env python3
-"""Ensure each tool contracts.py defines ToolInput, ToolOutput, and run."""
+"""Ensure each tool contracts.py defines ToolInput, ToolOutput, and run with strict shape."""
 
 from __future__ import annotations
 
 import ast
 from pathlib import Path
+from typing import Optional
+
+
+def _has_dataclass_decorator(node: ast.ClassDef) -> bool:
+    for dec in node.decorator_list:
+        if isinstance(dec, ast.Name) and dec.id == "dataclass":
+            return True
+        if isinstance(dec, ast.Attribute) and dec.attr == "dataclass":
+            return True
+    return False
+
+
+def _annotation_name(node: Optional[ast.AST]) -> Optional[str]:
+    if node is None:
+        return None
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return node.attr
+    return None
+
+
+def _run_signature_ok(node: ast.FunctionDef) -> Optional[str]:
+    if len(node.args.args) != 1:
+        return "run must accept exactly one argument"
+    arg = node.args.args[0]
+    arg_ann = _annotation_name(arg.annotation)
+    if arg_ann != "ToolInput":
+        return "run argument must be annotated as ToolInput"
+    ret_ann = _annotation_name(node.returns)
+    if ret_ann != "ToolOutput":
+        return "run return annotation must be ToolOutput"
+    return None
 
 
 def main() -> int:
@@ -29,10 +62,34 @@ def main() -> int:
             failures.append(f"{tool_dir.name}: contracts.py syntax error")
             continue
 
-        names = {node.name for node in ast.walk(tree) if isinstance(node, (ast.FunctionDef, ast.ClassDef))}
-        missing = {"ToolInput", "ToolOutput", "run"} - names
+        classes = {
+            node.name: node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ClassDef)
+        }
+        functions = {
+            node.name: node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef)
+        }
+
+        missing = {"ToolInput", "ToolOutput", "run"} - (set(classes) | set(functions))
         if missing:
             failures.append(f"{tool_dir.name}: missing {', '.join(sorted(missing))}")
+            continue
+
+        for cls_name in ("ToolInput", "ToolOutput"):
+            cls = classes.get(cls_name)
+            if not cls:
+                continue
+            if not _has_dataclass_decorator(cls):
+                failures.append(f"{tool_dir.name}: {cls_name} must be a @dataclass")
+
+        run_fn = functions.get("run")
+        if run_fn:
+            err = _run_signature_ok(run_fn)
+            if err:
+                failures.append(f"{tool_dir.name}: {err}")
 
     if failures:
         print("Contracts check failed:")

@@ -49,8 +49,16 @@ def main() -> int:
             core_dir / "application" / "service.py",
             core_dir / "application" / "orchestrator.py",
         ]
+        tests_dir = core_dir / "tests"
+        test_files = list(tests_dir.glob("test_*.py")) if tests_dir.exists() else []
+        if not tests_dir.exists() or not test_files:
+            missing_tests = True
+        else:
+            missing_tests = False
         missing = [p for p in required if not p.exists()]
-        if missing:
+        if missing or missing_tests:
+            if missing_tests:
+                missing.append(tests_dir / "test_*.py")
             failures.append((tool, missing))
 
     if failures:

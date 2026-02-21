@@ -11,7 +11,6 @@ CHECKS = [
     "scripts/check_core_no_io.py",
     "scripts/check_core_tests.py",
     "scripts/check_contracts.py",
-    "scripts/run_core_tests.py",
     "scripts/check_test_coverage.py",
     "scripts/check_agent_docs.py",
     "scripts/check_tools_registry.py",

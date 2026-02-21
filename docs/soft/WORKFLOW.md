@@ -28,4 +28,4 @@ This is the step-by-step, LLM-friendly build flow. Follow in order. Do not skip 
 
 ## Skeleton Usage
 - Create core first: `scripts/new_tool_skeleton.py <tool_name>`
-- Add adapter later: `scripts/new_tool_skeleton.py <tool_name> --with-adapter`
+- Add adapters later, manually, after core artifacts + tests exist.
