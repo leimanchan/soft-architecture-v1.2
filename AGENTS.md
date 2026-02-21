@@ -1,58 +1,82 @@
-# AGENTS.md
+# AGENTS.md — Your Rules for Building Tools
 
-This repo is the mandatory starting point for creating or migrating any tool. All program creation and future unification start here.
+**You are an LLM agent. This file is your rulebook.** Every tool you create or migrate in this repo MUST follow the structure, workflow, and constraints below. These rules are enforced by automated checks — violations will be caught.
 
-This repo uses a strict Soft Code workflow to keep business logic decoupled from interfaces.
+## Your Job
+
+A user will ask you to build a tool (e.g., "build me a label printer" or "migrate my PDF splitter"). Your job is to produce working code that follows the Soft Code architecture. This means:
+
+1. **All business logic goes in `core/`** — pure Python, no I/O, no framework imports.
+2. **All I/O and UI goes in `adapters/`** — thin wrappers that call into core.
+3. **You follow the 6-step workflow** in `docs/soft/WORKFLOW.md`, in order, without skipping steps.
+4. **You run validation** via `scripts/preflight.py` before finishing.
+
+If you do not follow these rules, the code you produce will become rigid and unmaintainable — the exact problem this architecture exists to prevent.
 
 ## Canonical Structure
+
+Every tool you build produces this file tree:
+
 ```
-core/
-  <tool>/
-    DECISIONS.md
-    domain/
-      models.py
-      specs.py
-    application/
-      service.py
-      orchestrator.py
-    tests/
-adapters/
-  flask/
-    <tool>/
-      app.py
-      templates/
-      static/
-docs/
-  soft/
-  integration/
-scripts/
+core/<tool>/
+  DECISIONS.md                 <- Step 1: list every business decision
+  contracts.py                 <- Step 2: ToolInput, ToolOutput, run()
+  domain/
+    models.py                  <- Step 2: plain dataclasses
+    specs.py                   <- Step 2: constants and specifications
+  application/
+    service.py                 <- Step 3: pure decision functions
+    orchestrator.py            <- Step 4: dumb sequencer (max 60 lines)
+  tests/                       <- Step 3: unit tests (no I/O)
+
+adapters/flask/<tool>/         <- Step 5: built LAST, after core is complete
+  app.py
+  templates/
+  static/
 ```
 
 ## Hard Rules
-- Core must never import Flask/CLI/UI libraries.
-- All IO and frameworks live in adapters.
-- Domain models are plain data shapes.
-- Application layer wires decisions together (no IO).
-- Orchestrator is dumb and sequential.
-- Adapters are the last step. Do not modify adapters until core artifacts exist.
-- Adapter templates must extend the base kit and never use inline `<style>` blocks. Inline styling is a last resort only for hyper tool-specific needs and must include `<!-- inline-style:tool-specific -->`.
 
-## Soft Code Workflow
-Follow `docs/soft/WORKFLOW.md` in order.
+These are non-negotiable. Automated checks enforce them.
 
-## Two Paths
-- New tool: follow `docs/soft/WORKFLOW.md`.
-- Existing tool migration: follow `docs/soft/MIGRATION_WORKFLOW.md`.
+| Rule | Enforced By |
+|------|-------------|
+| Core must NEVER import Flask, FastAPI, Django, Click, Typer, requests, or adapters | `check_core_purity.py` |
+| Core must NEVER use open(), os, pathlib, subprocess, socket, shutil, or any I/O | `check_core_no_io.py` |
+| Orchestrators must be <=60 lines with NO branching (no if/for/while/try/with/match) | `check_orchestrator_dumb.py` |
+| Adapters must NOT be modified until core artifacts exist | `check_adapter_after_core.py` |
+| Templates must extend `base.html` from the shared UI kit | `check_adapter_uses_base.py` |
+| Templates must NOT contain inline `<style>` blocks | `check_adapter_no_inline_styles.py` |
+| All registered tools must have tests | `check_core_tests.py` |
+| Domain models are plain dataclasses — no methods with side effects | Convention |
+
+## Workflow
+
+Follow `docs/soft/WORKFLOW.md` in order. The steps are:
+
+1. **Decisions** — Write `core/<tool>/DECISIONS.md`. List every business decision the tool makes (not how, just what).
+2. **Data Shapes** — Create `domain/models.py`, `domain/specs.py`, and `contracts.py`. Plain dataclasses only.
+3. **Decision Functions** — Implement `application/service.py` and write tests. Pure functions, no I/O.
+4. **Orchestrator** — Write `application/orchestrator.py`. A dumb sequencer that calls your service functions in order. Max 60 lines, no branching.
+5. **Adapters** — NOW you can touch `adapters/`. Build Flask routes, templates, static files. Convert HTTP requests to domain objects, call core, convert back.
+6. **Verification** — Run `scripts/preflight.py`. All checks must pass.
+
+For migrating existing tools, follow `docs/soft/MIGRATION_WORKFLOW.md` instead.
 
 ## Key Docs
-- `docs/soft/WORKFLOW.md`
-- `docs/integration/CHECKLIST.md`
-- `docs/agent/INTERFACE_SPEC.md`
-- `docs/integration/ADAPTER_UI_KIT.md`
-- `docs/manifesto/BUILDING_SOFTWARE_THAT_STAYS_SOFT.md`
+
+- `docs/soft/WORKFLOW.md` — The 6-step build process (your primary guide)
+- `docs/integration/CHECKLIST.md` — Requirements checklist for new tools
+- `docs/agent/INTERFACE_SPEC.md` — How tools expose contracts for other agents
+- `docs/integration/ADAPTER_UI_KIT.md` — Shared Flask template kit
+- `docs/manifesto/BUILDING_SOFTWARE_THAT_STAYS_SOFT.md` — The full rationale
 
 ## Checks
-- `scripts/check_core_purity.py`
-- `scripts/soft_checkpoints.py <tool_name>`
-- `scripts/preflight.py`
-- `scripts/install_hooks.py`
+
+Run these before you consider a tool complete:
+
+```
+python3 scripts/preflight.py              # runs ALL checks
+python3 scripts/soft_checkpoints.py <tool> # check workflow progress
+python3 scripts/install_hooks.py           # install git hooks
+```
