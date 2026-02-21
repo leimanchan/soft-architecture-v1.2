@@ -18,6 +18,7 @@ CHECKS = [
     "scripts/check_adapter_after_core.py",
     "scripts/check_orchestrator_dumb.py",
     "scripts/guard_adapters.py",
+    "scripts/check_hooks_installed.py",
 ]
 
 

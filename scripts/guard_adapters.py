@@ -10,7 +10,7 @@ from pathlib import Path
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     result = subprocess.run(
-        ["git", "status", "--porcelain"],
+        ["git", "status", "--porcelain", "-z"],
         cwd=str(root),
         capture_output=True,
         text=True,
@@ -20,9 +20,10 @@ def main() -> int:
         print("Failed to read git status")
         return 1
 
+    entries = [e for e in result.stdout.split("\0") if e]
     changed = []
-    for line in result.stdout.splitlines():
-        path = line[3:].strip()
+    for entry in entries:
+        path = entry[3:].strip()
         if path.startswith("adapters/"):
             changed.append(path)
 

@@ -55,3 +55,4 @@ Follow `docs/soft/WORKFLOW.md` in order.
 - `scripts/check_core_purity.py`
 - `scripts/soft_checkpoints.py <tool_name>`
 - `scripts/preflight.py`
+- `scripts/install_hooks.py`

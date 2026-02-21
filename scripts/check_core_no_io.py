@@ -8,6 +8,8 @@ from pathlib import Path
 
 FORBIDDEN_FUNCS = {
     "open",
+    "system",
+    "popen",
 }
 
 FORBIDDEN_MODULES = {
@@ -17,6 +19,31 @@ FORBIDDEN_MODULES = {
     "subprocess",
     "socket",
     "shutil",
+}
+
+FORBIDDEN_METHODS = {
+    "open",
+    "read_text",
+    "write_text",
+    "mkdir",
+    "rglob",
+    "glob",
+    "iterdir",
+    "unlink",
+    "rename",
+    "replace",
+    "rmdir",
+    "chmod",
+    "touch",
+    "exists",
+    "stat",
+    "lstat",
+    "walk",
+    "listdir",
+    "remove",
+    "makedirs",
+    "mkdtemp",
+    "mkstemp",
 }
 
 
@@ -60,16 +87,23 @@ def scan_file(path: Path) -> list[str]:
         if isinstance(node, ast.Call):
             func = node.func
             if isinstance(func, ast.Name):
-                if func.id in FORBIDDEN_FUNCS:
-                    violations.append(f"{path}:{node.lineno}: forbidden IO call '{func.id}'")
+                name = func.id
+                if name in FORBIDDEN_FUNCS:
+                    violations.append(f"{path}:{node.lineno}: forbidden IO call '{name}'")
+                # detect imported functions like: from os import system
+                if name in imports:
+                    root_module = imports[name].split(".")[0]
+                    if root_module in FORBIDDEN_MODULES:
+                        violations.append(f"{path}:{node.lineno}: forbidden IO call '{imports[name]}'")
             elif isinstance(func, ast.Attribute):
                 root = _root_name(func)
+                attr = func.attr
+                if attr in FORBIDDEN_METHODS:
+                    violations.append(f"{path}:{node.lineno}: forbidden IO method '{attr}'")
                 if root in imports:
-                    module = imports[root].split(".")[0]
-                else:
-                    module = root
-                if module in FORBIDDEN_MODULES:
-                    violations.append(f"{path}:{node.lineno}: forbidden IO call '{module}'")
+                    root_module = imports[root].split(".")[0]
+                    if root_module in FORBIDDEN_MODULES:
+                        violations.append(f"{path}:{node.lineno}: forbidden IO call '{root_module}'")
     return violations
 
 

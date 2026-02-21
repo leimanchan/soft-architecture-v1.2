@@ -7,7 +7,11 @@ import ast
 from pathlib import Path
 
 MAX_LINES = 60
-FORBIDDEN_NODES = (ast.If, ast.For, ast.While, ast.Try, ast.With, ast.Match)
+
+FORBIDDEN_NODES = [ast.If, ast.For, ast.While, ast.Try, ast.With]
+if hasattr(ast, "Match"):
+    FORBIDDEN_NODES.append(ast.Match)
+FORBIDDEN_NODES = tuple(FORBIDDEN_NODES)
 
 
 def main() -> int:

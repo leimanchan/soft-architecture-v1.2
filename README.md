@@ -69,6 +69,12 @@ Then open `http://localhost:8000`.
 - `scripts/check_adapter_after_core.py`
 - `scripts/check_orchestrator_dumb.py`
 - `scripts/guard_adapters.py`
+- `scripts/check_hooks_installed.py`
+
+## Install Hooks
+```
+python3 scripts/install_hooks.py
+```
 - `scripts/check_orchestrator_dumb.py`
 - `scripts/guard_adapters.py`
 

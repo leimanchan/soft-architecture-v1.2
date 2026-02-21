@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ensure each registered tool has at least one decision test."""
+"""Ensure each tool has at least one decision test and registry matches core."""
 
 from __future__ import annotations
 
@@ -22,9 +22,10 @@ def main() -> int:
 
     registry = json.loads(registry_path.read_text(encoding="utf-8"))
     tools = registry.get("tools", [])
-    registered = {t.get("name") for t in tools if t.get("status") != "deprecated"}
+    registered = {t.get("name") for t in tools if t.get("status") != "deprecated" and t.get("name")}
 
     core_tools = [d for d in core_dir.iterdir() if d.is_dir() and not d.name.startswith("_")]
+    core_names = {d.name for d in core_tools}
 
     if not registered:
         if core_tools:
@@ -34,11 +35,17 @@ def main() -> int:
         return 0
 
     failures = []
-    for tool_name in sorted(registered):
+
+    unregistered = core_names - registered
+    if unregistered:
+        failures.append(f"Unregistered core tools: {', '.join(sorted(unregistered))}")
+
+    missing_core = registered - core_names
+    if missing_core:
+        failures.append(f"Registry tools missing in core/: {', '.join(sorted(missing_core))}")
+
+    for tool_name in sorted(registered & core_names):
         tool_dir = core_dir / tool_name
-        if not tool_dir.exists():
-            failures.append(f"{tool_name}: core folder missing")
-            continue
         tests_dir = tool_dir / "tests"
         if not tests_dir.exists():
             failures.append(f"{tool_name}: tests/ missing")

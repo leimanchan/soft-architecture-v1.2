@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Ensure adapters are only edited after core artifacts exist."""
+"""Ensure adapters are only edited after core artifacts exist (staged)."""
 
 from __future__ import annotations
 
@@ -9,9 +9,8 @@ from pathlib import Path
 
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    # Get staged files
     result = subprocess.run(
-        ["git", "diff", "--cached", "--name-only"],
+        ["git", "diff", "--cached", "--name-only", "-z"],
         cwd=str(root),
         capture_output=True,
         text=True,
@@ -21,12 +20,11 @@ def main() -> int:
         print("Failed to read staged files")
         return 1
 
-    staged = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+    entries = [e for e in result.stdout.split("\0") if e]
     tools = set()
-    for path in staged:
+    for path in entries:
         parts = path.split("/")
         if len(parts) >= 3 and parts[0] == "adapters":
-            # adapters/<interface>/<tool>/...
             if parts[2] != "_base":
                 tools.add(parts[2])
 
@@ -34,7 +32,6 @@ def main() -> int:
         print("Adapter sequencing check passed.")
         return 0
 
-    # For each tool touched in adapters, ensure core artifacts exist
     failures = []
     for tool in sorted(tools):
         core_dir = root / "core" / tool

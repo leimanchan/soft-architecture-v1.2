@@ -9,14 +9,22 @@ from pathlib import Path
 
 def main() -> int:
     if len(sys.argv) < 2:
-        print("Usage: scripts/new_tool_skeleton.py <tool_name> [--with-adapter]")
+        print("Usage: scripts/new_tool_skeleton.py <tool_name> [--with-adapter] [--register --description \"...\"]")
         return 1
 
     tool_name = sys.argv[1].strip().lower().replace(" ", "_")
-    with_adapter = "--with-adapter" in sys.argv[2:]
     if not tool_name:
         print("Tool name is required.")
         return 1
+
+    args = sys.argv[2:]
+    with_adapter = "--with-adapter" in args
+    register = "--register" in args
+    description = None
+    if "--description" in args:
+        idx = args.index("--description")
+        if idx + 1 < len(args):
+            description = args[idx + 1].strip()
 
     root = Path(__file__).resolve().parents[1]
 
@@ -72,25 +80,24 @@ def main() -> int:
             encoding="utf-8",
         )
 
-    # Auto-register tool in tools_registry.json if present
-    registry_path = root / "tools_registry.json"
-    if registry_path.exists():
-        try:
+    if register:
+        if not description:
+            print("--register requires --description")
+            return 1
+        registry_path = root / "tools_registry.json"
+        if registry_path.exists():
             import json
-
             registry = json.loads(registry_path.read_text(encoding="utf-8"))
             tools = registry.get("tools", [])
             if not any(tool.get("name") == tool_name for tool in tools):
                 tools.append({
                     "name": tool_name,
-                    "description": "TODO",
+                    "description": description,
                     "status": "active",
                     "contracts": f"core/{tool_name}/contracts.py",
                 })
                 registry["tools"] = tools
                 registry_path.write_text(json.dumps(registry, indent=2), encoding="utf-8")
-        except Exception:
-            pass
 
     print(f"Created skeleton for: {tool_name}")
     return 0

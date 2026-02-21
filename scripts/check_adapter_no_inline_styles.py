@@ -1,9 +1,23 @@
 #!/usr/bin/env python3
-"""Fail if adapter templates include inline <style> blocks."""
+"""Fail if adapter templates include inline <style> blocks without marker."""
 
 from __future__ import annotations
 
 from pathlib import Path
+
+MARKER = "inline-style:tool-specific"
+
+
+def _style_blocks(text: str) -> list[int]:
+    offsets = []
+    idx = 0
+    while True:
+        idx = text.find("<style", idx)
+        if idx == -1:
+            break
+        offsets.append(idx)
+        idx += 6
+    return offsets
 
 
 def main() -> int:
@@ -15,16 +29,21 @@ def main() -> int:
 
     violations = []
     for path in templates_root.rglob("*.html"):
-        # Skip the base kit itself
         if "_base" in path.parts:
             continue
         text = path.read_text(encoding="utf-8", errors="ignore")
-        if "<style" in text:
-            if "inline-style:tool-specific" not in text:
-                violations.append(str(path))
+        offsets = _style_blocks(text)
+        if not offsets:
+            continue
+        lines = text.splitlines()
+        for i, line in enumerate(lines):
+            if "<style" in line:
+                window = "\n".join(lines[max(i-2, 0):i+1])
+                if MARKER not in window:
+                    violations.append(f"{path}:{i+1}")
 
     if violations:
-        print("Inline <style> blocks found in templates:")
+        print("Inline <style> blocks found without marker:")
         for v in violations:
             print(f"- {v}")
         return 1
