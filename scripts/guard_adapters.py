@@ -1,76 +1,29 @@
 #!/usr/bin/env python3
-"""Block adapter changes if core artifacts do not exist (working tree)."""
+"""Compatibility wrapper for working-tree adapter sequencing checks."""
 
 from __future__ import annotations
 
+import os
 import subprocess
 from pathlib import Path
 
 
+def _python_cmd(root: Path, env: dict[str, str]) -> list[str]:
+    override = env.get("PYTHON_EXECUTABLE")
+    if override:
+        return [override]
+    venv_python = root / ".venv" / "bin" / "python"
+    if venv_python.exists():
+        return [str(venv_python)]
+    return ["python3"]
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
-    result = subprocess.run(
-        ["git", "status", "--porcelain", "-z"],
-        cwd=str(root),
-        capture_output=True,
-        text=True,
-        check=False,
-    )
-    if result.returncode != 0:
-        print("Failed to read git status")
-        return 1
-
-    entries = [e for e in result.stdout.split("\0") if e]
-    changed = []
-    for entry in entries:
-        path = entry[3:].strip()
-        if path.startswith("adapters/"):
-            changed.append(path)
-
-    tools = set()
-    for path in changed:
-        parts = path.split("/")
-        if len(parts) >= 3 and parts[0] == "adapters":
-            if parts[2] != "_base":
-                tools.add(parts[2])
-
-    if not tools:
-        print("Adapter guard passed.")
-        return 0
-
-    failures = []
-    for tool in sorted(tools):
-        core_dir = root / "core" / tool
-        required = [
-            core_dir / "DECISIONS.md",
-            core_dir / "domain" / "models.py",
-            core_dir / "domain" / "specs.py",
-            core_dir / "contracts.py",
-            core_dir / "application" / "service.py",
-            core_dir / "application" / "orchestrator.py",
-        ]
-        tests_dir = core_dir / "tests"
-        test_files = list(tests_dir.glob("test_*.py")) if tests_dir.exists() else []
-        if not tests_dir.exists() or not test_files:
-            missing_tests = True
-        else:
-            missing_tests = False
-        missing = [p for p in required if not p.exists()]
-        if missing or missing_tests:
-            if missing_tests:
-                missing.append(tests_dir / "test_*.py")
-            failures.append((tool, missing))
-
-    if failures:
-        print("Adapter changes detected before core artifacts exist (working tree):")
-        for tool, missing in failures:
-            print(f"- {tool} missing:")
-            for p in missing:
-                print(f"  - {p}")
-        return 1
-
-    print("Adapter guard passed.")
-    return 0
+    env = os.environ.copy()
+    cmd = _python_cmd(root, env) + ["scripts/check_adapter_sequence.py", "--scope", "working-tree"]
+    result = subprocess.run(cmd, cwd=str(root), env=env)
+    return result.returncode
 
 
 if __name__ == "__main__":

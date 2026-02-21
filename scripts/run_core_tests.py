@@ -9,6 +9,9 @@ from pathlib import Path
 
 
 def _python_cmd(root: Path) -> list[str]:
+    override = os.environ.get("PYTHON_EXECUTABLE")
+    if override:
+        return [override]
     venv_python = root / ".venv" / "bin" / "python"
     if venv_python.exists():
         return [str(venv_python)]

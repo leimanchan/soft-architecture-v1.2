@@ -65,6 +65,41 @@ def _test_has_nontrivial_assert(path: Path) -> bool:
     return False
 
 
+def _test_case_count(path: Path) -> int:
+    try:
+        text = path.read_text(encoding="utf-8")
+        tree = ast.parse(text)
+    except Exception:
+        return 0
+
+    count = 0
+    for node in ast.walk(tree):
+        if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
+            count += 1
+    return count
+
+
+def _test_has_negative_path(path: Path) -> bool:
+    try:
+        text = path.read_text(encoding="utf-8")
+        tree = ast.parse(text)
+    except Exception:
+        return False
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.With):
+            for item in node.items:
+                ctx = item.context_expr
+                if isinstance(ctx, ast.Call):
+                    func = ctx.func
+                    if isinstance(func, ast.Attribute) and func.attr == "raises":
+                        return True
+        if isinstance(node, ast.Call):
+            if isinstance(node.func, ast.Attribute) and node.func.attr == "raises":
+                return True
+    return False
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     core_dir = root / "core"
@@ -106,20 +141,31 @@ def main() -> int:
         tool_dir = core_dir / tool_name
         tests_dir = tool_dir / "tests"
         if not tests_dir.exists():
-            failures.append(f"{tool_name}: tests/ missing")
+            failures.append(f"{tool_name}: tests/ missing (add tests/test_*.py with real assertions)")
             continue
         test_files = list(tests_dir.glob("test_*.py"))
         if not test_files:
-            failures.append(f"{tool_name}: no test_*.py files in tests/")
+            failures.append(f"{tool_name}: no test_*.py files in tests/ (add at least one)")
+            continue
+        total_cases = sum(_test_case_count(p) for p in test_files)
+        if not (len(test_files) >= 2 or total_cases >= 3):
+            failures.append(
+                f"{tool_name}: add tests (need >=2 test files or >=3 test cases)"
+            )
             continue
         if not any(_test_has_asserts(p) for p in test_files):
-            failures.append(f"{tool_name}: tests contain no asserts/raises")
+            failures.append(f"{tool_name}: tests contain no asserts/raises (add real assertions)")
             continue
         if not any(_test_has_nontrivial_assert(p) for p in test_files):
-            failures.append(f"{tool_name}: tests only contain trivial asserts")
+            failures.append(f"{tool_name}: tests only contain trivial asserts (assert real behavior)")
             continue
         if not any(_test_calls_run(p) for p in test_files):
-            failures.append(f"{tool_name}: tests do not call run()")
+            failures.append(f"{tool_name}: tests do not call run() (exercise contracts.run)")
+            continue
+        if not any(_test_has_negative_path(p) for p in test_files):
+            failures.append(
+                f"{tool_name}: add a negative-path test (e.g., pytest.raises on bad input)"
+            )
 
     if failures:
         print("Core tests check failed:")

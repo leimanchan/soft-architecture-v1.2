@@ -41,7 +41,27 @@ def main() -> int:
     (core_dir / "__init__.py").touch(exist_ok=True)
 
     (core_dir / "DECISIONS.md").write_text(
-        "# Decisions\n\n- TODO\n",
+        """# Decisions
+
+## Problem
+- What this tool does in one sentence.
+- What input it expects.
+- What output it guarantees.
+
+## Constraints
+- Performance or size constraints.
+- Data format constraints.
+- Any banned operations.
+
+## Behavior
+- Happy-path behavior summary.
+- Known edge cases.
+- Error/validation rules.
+
+## Notes
+- Dependencies (if any).
+- Future changes or open questions.
+""",
         encoding="utf-8",
     )
 
@@ -56,17 +76,27 @@ def main() -> int:
     )
 
     (core_dir / "contracts.py").write_text(
-        """\"\"\"Tool contract.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Dict, Any\n\n\n@dataclass\nclass ToolInput:\n    payload: Dict[str, Any]\n\n\n@dataclass\nclass ToolOutput:\n    result: Dict[str, Any]\n\n\ndef run(input_data: ToolInput) -> ToolOutput:\n    return ToolOutput(result={})\n""",
+        """\"\"\"Tool contract.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Dict, Any\n\nfrom core.{tool}.application.orchestrator import run as orchestrate\n\n\n@dataclass\nclass ToolInput:\n    payload: Dict[str, Any]\n\n\n@dataclass\nclass ToolOutput:\n    result: Dict[str, Any]\n\n\ndef run(input_data: ToolInput) -> ToolOutput:\n    if not isinstance(input_data.payload, dict):\n        raise ValueError(\"payload must be a dict\")\n    return ToolOutput(result=orchestrate(input_data.payload))\n""".format(tool=tool_name),
         encoding="utf-8",
     )
 
     (app_dir / "service.py").write_text(
-        """\"\"\"Application services / use cases.\"\"\"\n\n""",
+        """\"\"\"Application services / use cases.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Dict, Any\n\n\ndef echo(payload: Dict[str, Any]) -> Dict[str, Any]:\n    return {\"echo\": payload}\n""",
         encoding="utf-8",
     )
 
     (app_dir / "orchestrator.py").write_text(
-        """\"\"\"Dumb orchestrator.\"\"\"\n\n""",
+        """\"\"\"Dumb orchestrator.\"\"\"\n\nfrom __future__ import annotations\n\nfrom core.{tool}.application import service\n\n\ndef run(payload: dict) -> dict:\n    return service.echo(payload)\n""".format(tool=tool_name),
+        encoding="utf-8",
+    )
+
+    (tests_dir / "test_contracts.py").write_text(
+        """from core.{tool}.contracts import ToolInput, run\n\n\ndef test_run_echo():\n    payload = {{\"hello\": \"world\"}}\n    result = run(ToolInput(payload=payload))\n    assert result.result == {{\"echo\": payload}}\n""".format(tool=tool_name),
+        encoding="utf-8",
+    )
+
+    (tests_dir / "test_errors.py").write_text(
+        """import pytest\n\nfrom core.{tool}.contracts import ToolInput, run\n\n\ndef test_run_rejects_non_dict_payload():\n    with pytest.raises(ValueError):\n        run(ToolInput(payload=\"not-a-dict\"))\n""".format(tool=tool_name),
         encoding="utf-8",
     )
 

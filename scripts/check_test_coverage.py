@@ -11,7 +11,10 @@ from pathlib import Path
 DEFAULT_MIN = 50
 
 
-def _python_cmd(root: Path) -> list[str]:
+def _python_cmd(root: Path, env: dict) -> list[str]:
+    override = env.get("PYTHON_EXECUTABLE")
+    if override:
+        return [override]
     venv_python = root / ".venv" / "bin" / "python"
     if venv_python.exists():
         return [str(venv_python)]
@@ -23,9 +26,10 @@ def main() -> int:
     env = os.environ.copy()
     env["PYTHONPATH"] = str(root)
     min_cov = int(env.get("MIN_COVERAGE", DEFAULT_MIN))
-    cmd = _python_cmd(root) + [
+    cmd = _python_cmd(root, env) + [
         "-m",
         "pytest",
+        "--import-mode=importlib",
         "--cov=core",
         "--cov-report=term-missing",
         f"--cov-fail-under={min_cov}",

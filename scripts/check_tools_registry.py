@@ -3,7 +3,9 @@
 
 from __future__ import annotations
 
+import importlib
 import json
+import sys
 from pathlib import Path
 
 
@@ -27,6 +29,7 @@ def main() -> int:
         return 1
 
     errors = []
+    seen_names = set()
     for tool in tools:
         if not isinstance(tool, dict):
             errors.append("Tool entry must be an object")
@@ -35,8 +38,13 @@ def main() -> int:
         description = tool.get("description")
         status = tool.get("status")
         contracts = tool.get("contracts")
+        tombstone = tool.get("tombstone")
         if not name:
             errors.append("Tool missing 'name'")
+        elif name in seen_names:
+            errors.append(f"Duplicate tool name '{name}'")
+        else:
+            seen_names.add(name)
         if not description:
             errors.append(f"Tool '{name}' missing 'description'")
         elif isinstance(description, str) and description.strip().lower() == "todo":
@@ -46,8 +54,20 @@ def main() -> int:
         if not contracts:
             errors.append(f"Tool '{name}' missing 'contracts'")
         else:
-            if not (root / contracts).exists():
+            contracts_path = root / contracts
+            if not contracts_path.exists():
+                if status == "deprecated" and tombstone:
+                    continue
                 errors.append(f"Tool '{name}' contracts path not found: {contracts}")
+            else:
+                try:
+                    if str(root) not in sys.path:
+                        sys.path.insert(0, str(root))
+                    rel = contracts_path.relative_to(root).with_suffix("")
+                    module_path = ".".join(rel.parts)
+                    importlib.import_module(module_path)
+                except Exception as exc:
+                    errors.append(f"Tool '{name}' contracts import failed: {exc}")
 
     if errors:
         print("tools_registry.json validation failed:")

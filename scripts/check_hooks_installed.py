@@ -3,10 +3,14 @@
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 
 def main() -> int:
+    if os.environ.get("CI") or os.environ.get("GITHUB_ACTIONS"):
+        print("Hook check skipped in CI.")
+        return 0
     root = Path(__file__).resolve().parents[1]
     hook = root / ".git" / "hooks" / "pre-commit"
     if not hook.exists():

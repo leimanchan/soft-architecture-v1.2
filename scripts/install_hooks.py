@@ -9,14 +9,21 @@ HOOK = """#!/bin/sh
 set -e
 
 ROOT_DIR=$(git rev-parse --show-toplevel)
+PYTHON_EXEC="${PYTHON_EXECUTABLE:-}"
+if [ -z "$PYTHON_EXEC" ] && [ -x "$ROOT_DIR/.venv/bin/python" ]; then
+  PYTHON_EXEC="$ROOT_DIR/.venv/bin/python"
+fi
+if [ -z "$PYTHON_EXEC" ]; then
+  PYTHON_EXEC="python3"
+fi
 
-python3 "$ROOT_DIR/scripts/preflight.py"
+"$PYTHON_EXEC" "$ROOT_DIR/scripts/preflight.py"
 
 # If new tools were added under core/, enforce soft checkpoints for each.
 NEW_TOOLS=$(git diff --cached --name-only | awk -F/ '$1=="core" {print $2}' | sort -u)
 if [ -n "$NEW_TOOLS" ]; then
   for tool in $NEW_TOOLS; do
-    python3 "$ROOT_DIR/scripts/soft_checkpoints.py" "$tool"
+    "$PYTHON_EXEC" "$ROOT_DIR/scripts/soft_checkpoints.py" "$tool"
   done
 fi
 

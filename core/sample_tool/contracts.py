@@ -20,4 +20,6 @@ class ToolOutput:
 
 def run(input_data: ToolInput) -> ToolOutput:
     """Pure contract entrypoint."""
+    if not isinstance(input_data.payload, dict):
+        raise ValueError("payload must be a dict")
     return ToolOutput(result=orchestrate(input_data.payload))

@@ -36,6 +36,22 @@ def scan_file(path: Path) -> list[str]:
     except SyntaxError:
         return violations
 
+    alias_imports: set[str] = set()
+    imports: dict[str, str] = {}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                imports[alias.asname or alias.name] = alias.name
+        elif isinstance(node, ast.ImportFrom):
+            if node.module is None:
+                continue
+            for alias in node.names:
+                imports[alias.asname or alias.name] = f"{node.module}.{alias.name}"
+
+    for name, module in imports.items():
+        if module.endswith((".__import__", ".import_module")):
+            alias_imports.add(name)
+
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
@@ -49,7 +65,7 @@ def scan_file(path: Path) -> list[str]:
             if root in FORBIDDEN_IMPORTS:
                 violations.append(f"{path}:{node.lineno}: forbidden import '{root}'")
         elif isinstance(node, ast.Call):
-            if isinstance(node.func, ast.Name) and node.func.id == "__import__":
+            if isinstance(node.func, ast.Name) and node.func.id in {"__import__", *alias_imports}:
                 violations.append(f"{path}:{node.lineno}: dynamic import '__import__' not allowed")
             if isinstance(node.func, ast.Attribute):
                 if (
@@ -60,6 +76,13 @@ def scan_file(path: Path) -> list[str]:
                     violations.append(
                         f"{path}:{node.lineno}: dynamic import 'importlib.import_module' not allowed"
                     )
+                if isinstance(node.func.value, ast.Name):
+                    base = node.func.value.id
+                    if base in imports and imports[base].split(".")[0] == "importlib":
+                        if node.func.attr == "import_module":
+                            violations.append(
+                                f"{path}:{node.lineno}: dynamic import 'importlib.import_module' not allowed"
+                            )
     return violations
 
 
