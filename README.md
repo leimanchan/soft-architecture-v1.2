@@ -102,6 +102,9 @@ python3 scripts/preflight.py
 - `COVERAGE_STAGE=stage2` enforces 75% minimum coverage.
 - `MIN_COVERAGE=<int>` overrides stage gates for controlled rollouts.
 
+## Dependency Pins
+`requirements.txt` is pinned to the current `.venv`. If you upgrade dependencies, re-pin the file to match the environment before committing.
+
 ## Flask UI Kit Demo
 
 To preview the shared UI components (not a tool — just the base template kit):
