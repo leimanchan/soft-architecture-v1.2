@@ -6,6 +6,12 @@
       "description": "Minimal sample tool for validating the workflow",
       "status": "active",
       "contracts": "core/sample_tool/contracts.py"
+    },
+    {
+      "name": "order_quote",
+      "description": "Reference pricing tool that computes deterministic order quotes from item rows",
+      "status": "active",
+      "contracts": "core/order_quote/contracts.py"
     }
   ]
 }

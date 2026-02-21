@@ -82,6 +82,42 @@ def _root_name(node: ast.AST) -> str | None:
     return None
 
 
+def _const_str(node: ast.AST | None) -> str | None:
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value
+    return None
+
+
+def _subscript_key(node: ast.Subscript) -> str | None:
+    # Py3.9+ stores the key directly in `slice`.
+    return _const_str(node.slice)
+
+
+def _resolved_module(name: str, imports: dict[str, str]) -> str | None:
+    if name in imports:
+        return imports[name]
+    return None
+
+
+def _is_builtin_or_io_target(node: ast.AST, imports: dict[str, str]) -> bool:
+    if isinstance(node, ast.Name):
+        if node.id in {"__builtins__", "builtins"}:
+            return True
+        resolved = _resolved_module(node.id, imports)
+        if resolved and resolved.split(".")[0] in {"builtins", "io"}:
+            return True
+    if isinstance(node, ast.Attribute):
+        root = _root_name(node)
+        if root is None:
+            return False
+        if root in {"__builtins__", "builtins", "io"}:
+            return True
+        resolved = _resolved_module(root, imports)
+        if resolved and resolved.split(".")[0] in {"builtins", "io"}:
+            return True
+    return False
+
+
 def scan_file(path: Path) -> list[str]:
     violations = []
     try:
@@ -120,6 +156,33 @@ def scan_file(path: Path) -> list[str]:
                         for target in targets:
                             if isinstance(target, ast.Name):
                                 alias_funcs.add(target.id)
+            if isinstance(value, ast.Call):
+                if isinstance(value.func, ast.Name) and value.func.id == "getattr" and len(value.args) >= 2:
+                    attr_name = _const_str(value.args[1])
+                    if attr_name and (attr_name in FORBIDDEN_FUNCS or attr_name in FORBIDDEN_METHODS):
+                        if _is_builtin_or_io_target(value.args[0], imports):
+                            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                            for target in targets:
+                                if isinstance(target, ast.Name):
+                                    alias_funcs.add(target.id)
+                if (
+                    isinstance(value.func, ast.Name)
+                    and value.func.id == "__import__"
+                    and value.args
+                    and _const_str(value.args[0]) in {"builtins", "io"}
+                ):
+                    targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                    for target in targets:
+                        if isinstance(target, ast.Name):
+                            alias_funcs.add(target.id)
+            if isinstance(value, ast.Subscript):
+                key = _subscript_key(value)
+                if key and key in FORBIDDEN_FUNCS | FORBIDDEN_METHODS:
+                    if isinstance(value.value, ast.Name) and value.value.id == "__builtins__":
+                        targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                        for target in targets:
+                            if isinstance(target, ast.Name):
+                                alias_funcs.add(target.id)
 
     for node in ast.walk(tree):
         if isinstance(node, ast.Call):
@@ -135,6 +198,10 @@ def scan_file(path: Path) -> list[str]:
             elif isinstance(func, ast.Attribute):
                 root = _root_name(func)
                 attr = func.attr
+                if root in {"builtins", "__builtins__"} and attr == "open":
+                    violations.append(f"{path}:{node.lineno}: forbidden IO call '{root}.open'")
+                if root == "io" and attr == "open":
+                    violations.append(f"{path}:{node.lineno}: forbidden IO call 'io.open'")
                 if isinstance(func.value, ast.Name):
                     base = func.value.id
                     if base == "importlib" and attr == "import_module":
@@ -145,6 +212,10 @@ def scan_file(path: Path) -> list[str]:
                         violations.append(
                             f"{path}:{node.lineno}: forbidden dynamic import 'importlib.import_module'"
                         )
+                    if base in imports and imports[base].split(".")[0] == "builtins" and attr == "open":
+                        violations.append(f"{path}:{node.lineno}: forbidden IO call 'builtins.open'")
+                    if base in imports and imports[base].split(".")[0] == "io" and attr == "open":
+                        violations.append(f"{path}:{node.lineno}: forbidden IO call 'io.open'")
                 if root in imports:
                     root_module = imports[root].split(".")[0]
                     if root_module in FORBIDDEN_MODULES:
@@ -157,6 +228,17 @@ def scan_file(path: Path) -> list[str]:
                     if attr_arg.value in FORBIDDEN_FUNCS or attr_arg.value in FORBIDDEN_METHODS:
                         violations.append(
                             f"{path}:{node.lineno}: forbidden getattr for '{attr_arg.value}'"
+                        )
+                    if attr_arg.value == "open" and _is_builtin_or_io_target(node.args[0], imports):
+                        violations.append(
+                            f"{path}:{node.lineno}: forbidden dynamic IO lookup for '{attr_arg.value}'"
+                        )
+            if isinstance(func, ast.Subscript):
+                key = _subscript_key(func)
+                if key and key in FORBIDDEN_FUNCS | FORBIDDEN_METHODS:
+                    if isinstance(func.value, ast.Name) and func.value.id == "__builtins__":
+                        violations.append(
+                            f"{path}:{node.lineno}: forbidden dynamic IO call '__builtins__[\"{key}\"]'"
                         )
     return violations
 

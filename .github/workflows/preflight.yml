@@ -21,4 +21,5 @@ jobs:
       - name: Run preflight
         env:
           CI: "true"
+          COVERAGE_STAGE: "stage1"
         run: python3 scripts/preflight.py

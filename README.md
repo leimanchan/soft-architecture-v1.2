@@ -97,6 +97,11 @@ python3 scripts/preflight.py
 - CI: `python3 scripts/preflight_core.py`
 - Local: `python3 scripts/preflight.py`
 
+## Coverage Gates (Staged)
+- `COVERAGE_STAGE=stage1` enforces 65% minimum coverage.
+- `COVERAGE_STAGE=stage2` enforces 75% minimum coverage.
+- `MIN_COVERAGE=<int>` overrides stage gates for controlled rollouts.
+
 ## Flask UI Kit Demo
 
 To preview the shared UI components (not a tool — just the base template kit):
