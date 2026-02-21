@@ -5,18 +5,12 @@
 - Constants/specs are in `core/<tool>/domain/specs.py`.
 - Schema checklist exists in `core/<tool>/domain/schema_checklist.md`.
 - Examples exist in `core/<tool>/examples/`.
-- `contracts.py` includes a `contracts_version` string in ToolInput/ToolOutput.
-- `core/<tool>/__init__.py` exists.
-- `core/<tool>/README.md` exists with run/usage notes.
 - Application workflows are in `core/<tool>/application/service.py`.
 - Core has no imports of Flask, Click, or adapter modules.
 - Adapter is under `adapters/flask/<tool>/` and is thin.
 - Adapter uses `io.py` for side effects and `presenter.py` for mapping.
 - Adapter declares runtime dependencies in `RUNTIME_DEPENDENCIES.md`.
-- Adapter assets live under `adapters/flask/<tool>/assets/`.
-- Adapter smoke tests exist under `adapters/flask/<tool>/tests/`.
 - Adapter maps input → domain models.
-- Adapter calls core only via `core/<tool>/contracts.run`.
+- Adapter calls application services only.
 - UI/template files are isolated to the adapter.
-- tools_registry entry includes `name`, `description`, `status`, `contracts`, `origin`, `path`, `icon`.
 - `scripts/check_core_purity.py` passes.
