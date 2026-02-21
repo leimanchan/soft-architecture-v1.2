@@ -1,5 +1,1 @@
 flask
-pandas
-reportlab
-pypdf
-openpyxl

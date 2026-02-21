@@ -1,0 +1,1 @@
+"""Domain specs/constants."""

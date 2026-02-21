@@ -93,6 +93,10 @@ python3 scripts/install_hooks.py
 python3 scripts/preflight.py
 ```
 
+## CI vs Local
+- CI: `python3 scripts/preflight_core.py`
+- Local: `python3 scripts/preflight.py`
+
 ## Flask UI Kit Demo
 
 To preview the shared UI components (not a tool — just the base template kit):

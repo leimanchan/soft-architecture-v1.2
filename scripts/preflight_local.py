@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run all preflight checks (core + local)."""
+"""Run local-only checks (git hooks, env)."""
 
 from __future__ import annotations
 
@@ -7,8 +7,7 @@ import subprocess
 from pathlib import Path
 
 CHECKS = [
-    "scripts/preflight_core.py",
-    "scripts/preflight_local.py",
+    "scripts/check_hooks_installed.py",
 ]
 
 
@@ -24,7 +23,7 @@ def main() -> int:
         if result.returncode != 0:
             return result.returncode
 
-    print("Preflight passed.")
+    print("Preflight local passed.")
     return 0
 
 

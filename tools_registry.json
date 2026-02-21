@@ -1,4 +1,11 @@
 {
   "version": "1.0",
-  "tools": []
+  "tools": [
+    {
+      "name": "sample_tool",
+      "description": "Minimal sample tool",
+      "status": "active",
+      "contracts": "core/sample_tool/contracts.py"
+    }
+  ]
 }

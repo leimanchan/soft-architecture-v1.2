@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run all preflight checks (core + local)."""
+"""Run core repository checks (CI-safe)."""
 
 from __future__ import annotations
 
@@ -7,8 +7,16 @@ import subprocess
 from pathlib import Path
 
 CHECKS = [
-    "scripts/preflight_core.py",
-    "scripts/preflight_local.py",
+    "scripts/check_core_purity.py",
+    "scripts/check_core_no_io.py",
+    "scripts/check_core_tests.py",
+    "scripts/check_agent_docs.py",
+    "scripts/check_tools_registry.py",
+    "scripts/check_adapter_no_inline_styles.py",
+    "scripts/check_adapter_uses_base.py",
+    "scripts/check_adapter_after_core.py",
+    "scripts/check_orchestrator_dumb.py",
+    "scripts/guard_adapters.py",
 ]
 
 
@@ -24,7 +32,7 @@ def main() -> int:
         if result.returncode != 0:
             return result.returncode
 
-    print("Preflight passed.")
+    print("Preflight core passed.")
     return 0
 
 
