@@ -32,7 +32,10 @@ core/<tool>/
     specs.py                   <- Step 2: constants and specifications
     schema_checklist.md        <- Step 2: required keys/types/defaults
   application/
-    service.py                 <- Step 3: pure decision functions
+    input_validation.py        <- Step 3: normalize/validate payloads
+    decision_logic.py          <- Step 3: pure decision functions
+    output_mapping.py          <- Step 3: serialize core output
+    service.py                 <- Optional compatibility facade/re-exports
     orchestrator.py            <- Step 4: dumb sequencer (max 60 lines)
   tests/                       <- Step 3: unit tests (no I/O)
   MIGRATION_MAP.md             <- Migration only: old -> new mapping
@@ -80,7 +83,7 @@ Follow `docs/soft/WORKFLOW.md` in order. The steps are:
 
 1. **Decisions** — Write `core/<tool>/DECISIONS.md`. List every business decision the tool makes (not how, just what), plus a **Non-goals** section.
 2. **Data Shapes** — Create `domain/models.py`, `domain/specs.py`, and `contracts.py`. Plain dataclasses only. Include a `contracts_version` string in ToolInput/ToolOutput and document it in `schema_checklist.md`.
-3. **Decision Functions** — Implement `application/service.py` and write tests. Pure functions, no I/O.
+3. **Decision Functions** — Implement split decision modules under `application/` and write tests. Pure functions, no I/O.
 4. **Orchestrator** — Write `application/orchestrator.py`. A dumb sequencer that calls your service functions in order. Max 60 lines, no branching.
 5. **Adapters** — NOW you can touch `adapters/`. Build Flask routes, templates, static files. Convert HTTP requests to domain objects, call core, convert back.
 6. **Verification** — Run `scripts/preflight.py`. All checks must pass.

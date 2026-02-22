@@ -40,6 +40,14 @@ def _run_signature_ok(node: ast.FunctionDef) -> Optional[str]:
     return None
 
 
+def _class_field_annotation(node: ast.ClassDef, field_name: str) -> Optional[ast.AST]:
+    for stmt in node.body:
+        if isinstance(stmt, ast.AnnAssign) and isinstance(stmt.target, ast.Name):
+            if stmt.target.id == field_name:
+                return stmt.annotation
+    return None
+
+
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     core_dir = root / "core"
@@ -84,6 +92,17 @@ def main() -> int:
                 continue
             if not _has_dataclass_decorator(cls):
                 failures.append(f"{tool_dir.name}: {cls_name} must be a @dataclass")
+                continue
+            contracts_version_ann = _class_field_annotation(cls, "contracts_version")
+            if contracts_version_ann is None:
+                failures.append(
+                    f"{tool_dir.name}: {cls_name} must define contracts_version: str"
+                )
+                continue
+            if _annotation_name(contracts_version_ann) != "str":
+                failures.append(
+                    f"{tool_dir.name}: {cls_name}.contracts_version must be annotated as str"
+                )
 
         run_fn = functions.get("run")
         if run_fn:

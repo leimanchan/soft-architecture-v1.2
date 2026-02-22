@@ -1,0 +1,16 @@
+{
+  "payload": {
+    "sheet_name": "",
+    "rows": "not-a-list",
+    "copies_per_record": 0,
+    "label_config": {
+      "fields": [
+        {
+          "column": "",
+          "y": 2.0,
+          "align": "diagonal"
+        }
+      ]
+    }
+  }
+}

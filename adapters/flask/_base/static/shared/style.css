@@ -4,11 +4,45 @@
     box-sizing: border-box;
 }
 
+:root {
+    --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    --color-bg-page: #eef8fb;
+    --color-text-default: #333;
+    --color-text-heading: #1b1f3b;
+    --color-text-muted: #666;
+    --color-border-soft: #e0e0e0;
+    --color-surface: #ffffff;
+    --color-surface-soft: #f8f9ff;
+    --radius-lg: 16px;
+    --radius-md: 10px;
+    --shadow-surface: 0 20px 60px rgba(0, 0, 0, 0.3);
+    --btn-bg: #f4f6ff;
+    --btn-border: #d9defc;
+    --btn-text: #1b1f3b;
+    --btn-hover-bg: #e9edff;
+    --btn-hover-border: #cfd6ff;
+    --btn-primary-bg: #e3e8ff;
+    --btn-primary-border: #cbd4ff;
+    --btn-primary-hover-bg: #d7dfff;
+    --btn-secondary-bg: #f7f8ff;
+    --btn-secondary-border: #e2e6ff;
+    --btn-secondary-text: #3b3f5b;
+    --status-success-bg: #eaf7ef;
+    --status-success-border: #cfe9d9;
+    --status-success-text: #1f4d33;
+    --status-error-bg: #fdecef;
+    --status-error-border: #f5c2c7;
+    --status-error-text: #9b1c1c;
+    --status-processing-bg: #fff7e6;
+    --status-processing-border: #ffe1b3;
+    --status-processing-text: #7a4b00;
+}
+
 body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-    background: #eef8fb 0%;
+    font-family: var(--font-body);
+    background: var(--color-bg-page);
     min-height: 100vh;
-    color: #333;
+    color: var(--color-text-default);
 }
 
 .page {
@@ -19,9 +53,9 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-surface);
     padding: 40px;
 }
 
@@ -56,13 +90,13 @@ body {
 
 .page-title h1 {
     font-size: 32px;
-    color: #333;
+    color: var(--color-text-default);
     margin-bottom: 6px;
 }
 
 .page-subtitle {
     font-size: 14px;
-    color: #666;
+    color: var(--color-text-muted);
 }
 
 .page-subtitle:empty {
@@ -94,36 +128,36 @@ body {
 }
 
 .tool-hub .btn {
-    padding: 10px 18px !important;
-    border-radius: 10px !important;
-    border: 1px solid #d9defc !important;
-    background: #f4f6ff !important;
-    color: #1b1f3b !important;
-    font-weight: 600 !important;
-    font-size: 14px !important;
-    cursor: pointer !important;
-    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease !important;
+    padding: 10px 18px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--btn-border);
+    background: var(--btn-bg);
+    color: var(--btn-text);
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .tool-hub .btn:hover {
-    background: #e9edff !important;
-    border-color: #cfd6ff !important;
-    box-shadow: 0 6px 16px rgba(27, 31, 59, 0.08) !important;
+    background: var(--btn-hover-bg);
+    border-color: var(--btn-hover-border);
+    box-shadow: 0 6px 16px rgba(27, 31, 59, 0.08);
 }
 
 .tool-hub .btn-primary {
-    background: #e3e8ff !important;
-    border-color: #cbd4ff !important;
+    background: var(--btn-primary-bg);
+    border-color: var(--btn-primary-border);
 }
 
 .tool-hub .btn-primary:hover {
-    background: #d7dfff !important;
+    background: var(--btn-primary-hover-bg);
 }
 
 .tool-hub .btn-secondary {
-    background: #f7f8ff !important;
-    border-color: #e2e6ff !important;
-    color: #3b3f5b !important;
+    background: var(--btn-secondary-bg);
+    border-color: var(--btn-secondary-border);
+    color: var(--btn-secondary-text);
 }
 
 .tool-hub .btn-success {
@@ -143,21 +177,21 @@ body {
 }
 
 .status.success {
-    background: #eaf7ef;
-    color: #1f4d33;
-    border: 1px solid #cfe9d9;
+    background: var(--status-success-bg);
+    color: var(--status-success-text);
+    border: 1px solid var(--status-success-border);
 }
 
 .status.error {
-    background: #fdecef;
-    color: #9b1c1c;
-    border: 1px solid #f5c2c7;
+    background: var(--status-error-bg);
+    color: var(--status-error-text);
+    border: 1px solid var(--status-error-border);
 }
 
 .status.processing {
-    background: #fff7e6;
-    color: #7a4b00;
-    border: 1px solid #ffe1b3;
+    background: var(--status-processing-bg);
+    color: var(--status-processing-text);
+    border: 1px solid var(--status-processing-border);
 }
 
 /* Status message variant (VDP) */
@@ -187,13 +221,13 @@ body {
 }
 /* Shared upload styling */
 .upload-area {
-    border: 2px dashed #d9defc;
+    border: 2px dashed var(--btn-border);
     border-radius: 12px;
     padding: 48px 24px;
     text-align: center;
     cursor: pointer;
     transition: border-color 0.2s ease, background 0.2s ease;
-    background: #f8f9ff;
+    background: var(--color-surface-soft);
     margin-bottom: 16px;
 }
 
@@ -205,11 +239,11 @@ body {
 }
 
 .upload-section {
-    border: 2px dashed #d9defc;
+    border: 2px dashed var(--btn-border);
     border-radius: 12px;
     padding: 30px 15px;
     text-align: center;
-    background: #f8f9ff;
+    background: var(--color-surface-soft);
     cursor: pointer;
     transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -267,13 +301,15 @@ body {
     font-size: 12px;
 }
 
-.upload-icon {
+.upload-area .upload-icon,
+.upload-section .upload-icon {
     margin-bottom: 12px;
     display: flex;
     justify-content: center;
 }
 
-.upload-icon svg {
+.upload-area .upload-icon svg,
+.upload-section .upload-icon svg {
     width: 32px;
     height: 32px;
     stroke-width: 1.5;

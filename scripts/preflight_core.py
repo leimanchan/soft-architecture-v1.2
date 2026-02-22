@@ -29,7 +29,10 @@ CHECKS = [
     "scripts/check_adapter_smoke.py",
     "scripts/check_adapter_no_inline_styles.py",
     "scripts/check_adapter_uses_base.py",
+    "scripts/check_ui_contracts.py",
     "scripts/check_adapter_sequence.py",
+    "scripts/check_application_split.py",
+    "scripts/check_service_facade.py",
     "scripts/check_orchestrator_dumb.py",
 ]
 

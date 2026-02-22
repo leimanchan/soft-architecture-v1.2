@@ -37,6 +37,7 @@ def main() -> int:
             if (
                 not tool_dir.is_dir()
                 or tool_dir.name in {"_base", "static", "templates"}
+                or tool_dir.name.startswith("__")
                 or tool_dir.name.startswith(".")
             ):
                 continue

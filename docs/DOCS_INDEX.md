@@ -5,6 +5,8 @@
 - `docs/OVERVIEW.md`: architecture overview.
 - `docs/integration/CHECKLIST.md`: required steps for a new tool.
 - `docs/integration/ADAPTER_UI_KIT.md`: shared Flask UI kit.
+- `docs/integration/ADAPTER_PORTABILITY.md`: Flask-first portability standard.
+- `docs/integration/templates/TOOL_UI_CONTRACT_TEMPLATE.md`: per-tool UI contract template.
 - `docs/agent/INTERFACE_SPEC.md`: agent calling conventions.
 - `docs/soft/WORKFLOW.md`: deterministic Soft Code workflow.
 - `docs/soft/01_decision_list.md`: Step 1.

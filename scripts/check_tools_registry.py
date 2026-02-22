@@ -39,6 +39,8 @@ def main() -> int:
         contracts = tool.get("contracts")
         tombstone = tool.get("tombstone")
         origin = tool.get("origin")
+        path = tool.get("path")
+        icon = tool.get("icon")
         if not name:
             errors.append("Tool missing 'name'")
         elif name in seen_names:
@@ -53,6 +55,25 @@ def main() -> int:
             errors.append(f"Tool '{name}' invalid status '{status}'")
         if origin not in {"new", "migrated"}:
             errors.append(f"Tool '{name}' invalid origin '{origin}'")
+        if not path:
+            errors.append(f"Tool '{name}' missing 'path'")
+        elif not isinstance(path, str):
+            errors.append(f"Tool '{name}' path must be a string")
+        else:
+            expected_path = f"core/{name}" if name else None
+            if expected_path and path != expected_path:
+                errors.append(
+                    f"Tool '{name}' path must be '{expected_path}' (found '{path}')"
+                )
+            path_dir = root / path
+            if not path_dir.exists() and not (status == "deprecated" and tombstone):
+                errors.append(f"Tool '{name}' path not found: {path}")
+        if not icon:
+            errors.append(f"Tool '{name}' missing 'icon'")
+        elif not isinstance(icon, str):
+            errors.append(f"Tool '{name}' icon must be a string")
+        elif not icon.strip():
+            errors.append(f"Tool '{name}' icon must be a non-empty string")
         if not contracts:
             errors.append(f"Tool '{name}' missing 'contracts'")
         else:

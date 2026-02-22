@@ -25,3 +25,10 @@ Rules:
 - Inline styling is a last resort only for hyper tool-specific needs.
 
 This kit is the single source of truth for shared styling.
+
+## Theming Contract
+
+- Prefer shared base classes for common UI (`.btn`, status blocks, upload areas, form controls).
+- Customize visuals with CSS variables (tokens) in the tool root container first, instead of redefining shared classes.
+- Use tool-scoped overrides only for unique widgets/behaviors that do not fit shared components.
+- Avoid generic global selectors in tool CSS (for example bare `.upload-icon`), because they can collide with shared styles.

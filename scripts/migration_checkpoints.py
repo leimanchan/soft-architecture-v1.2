@@ -31,7 +31,6 @@ def main() -> int:
         domain / "models.py",
         domain / "specs.py",
         domain / "schema_checklist.md",
-        app / "service.py",
         app / "orchestrator.py",
         contracts,
         core / "examples" / "happy_path.json",

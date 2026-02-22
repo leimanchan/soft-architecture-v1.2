@@ -66,7 +66,6 @@ def _missing_core_artifacts(root: Path, tool: str) -> list[Path]:
         core_dir / "domain" / "models.py",
         core_dir / "domain" / "specs.py",
         core_dir / "contracts.py",
-        core_dir / "application" / "service.py",
         core_dir / "application" / "orchestrator.py",
     ]
     missing = [p for p in required if not p.exists()]

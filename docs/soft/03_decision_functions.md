@@ -3,7 +3,8 @@
 Goal: Implement pure logic using the domain shapes.
 
 ## Output
-- `core/<tool>/application/service.py`
+- Split decision modules in `core/<tool>/application/` (for example: `input_validation.py`, `decision_logic.py`, `output_mapping.py`)
+- Optional: `core/<tool>/application/service.py` as a compatibility facade/re-export layer
 - Tests in `core/<tool>/tests/`
 
 ## Rules

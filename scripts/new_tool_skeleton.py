@@ -106,17 +106,39 @@ Document the required keys, types, and defaults for any nested config in your pa
     )
 
     (core_dir / "contracts.py").write_text(
-        """\"\"\"Tool contract.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Dict, Any\n\nfrom core.{tool}.application.orchestrator import run as orchestrate\n\n\n@dataclass\nclass ToolInput:\n    payload: Dict[str, Any]\n\n\n@dataclass\nclass ToolOutput:\n    result: Dict[str, Any]\n\n\ndef run(input_data: ToolInput) -> ToolOutput:\n    if not isinstance(input_data.payload, dict):\n        raise ValueError(\"payload must be a dict\")\n    return ToolOutput(result=orchestrate(input_data.payload))\n""".format(tool=tool_name),
+        """\"\"\"Tool contract.\"\"\"\n\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\nfrom typing import Dict, Any\n\nfrom core.{tool}.application.orchestrator import run as orchestrate\n\n\n@dataclass\nclass ToolInput:\n    payload: Dict[str, Any]\n    contracts_version: str = \"1.0\"\n\n\n@dataclass\nclass ToolOutput:\n    result: Dict[str, Any]\n    contracts_version: str = \"1.0\"\n\n\ndef run(input_data: ToolInput) -> ToolOutput:\n    if not isinstance(input_data.payload, dict):\n        raise ValueError(\"payload must be a dict\")\n    return ToolOutput(\n        result=orchestrate(input_data.payload),\n        contracts_version=input_data.contracts_version,\n    )\n""".format(tool=tool_name),
         encoding="utf-8",
     )
 
-    (app_dir / "service.py").write_text(
-        """\"\"\"Application services / use cases.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Dict, Any\n\n\ndef echo(payload: Dict[str, Any]) -> Dict[str, Any]:\n    return {\"echo\": payload}\n""",
+    (app_dir / "input_validation.py").write_text(
+        """\"\"\"Input normalization and validation.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\ndef build_input(payload: dict[str, Any]) -> dict[str, Any]:\n    if not isinstance(payload, dict):\n        raise ValueError(\"payload must be a dict\")\n    return dict(payload)\n""",
+        encoding="utf-8",
+    )
+
+    (app_dir / "decision_logic.py").write_text(
+        """\"\"\"Pure decision functions.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\ndef compute_echo(valid_input: dict[str, Any]) -> dict[str, Any]:\n    return {\"echo\": valid_input}\n""",
+        encoding="utf-8",
+    )
+
+    (app_dir / "output_mapping.py").write_text(
+        """\"\"\"Output serialization.\"\"\"\n\nfrom __future__ import annotations\n\nfrom typing import Any\n\n\ndef to_result_dict(decision_output: dict[str, Any]) -> dict[str, Any]:\n    return decision_output\n""",
+        encoding="utf-8",
+    )
+
+    (app_dir / "FILE_MAP.md").write_text(
+        """# Application File Map
+
+- `input_validation.py`: normalize and validate incoming payloads (`build_input`)
+- `decision_logic.py`: pure decision computation (`compute_echo`)
+- `output_mapping.py`: map decision output to contract response shape (`to_result_dict`)
+- `service.py`: optional compatibility facade/re-exports only (`__all__`)
+- `orchestrator.py`: dumb sequencing only (`run`)
+""",
         encoding="utf-8",
     )
 
     (app_dir / "orchestrator.py").write_text(
-        """\"\"\"Dumb orchestrator.\"\"\"\n\nfrom __future__ import annotations\n\nfrom core.{tool}.application import service\n\n\ndef run(payload: dict) -> dict:\n    return service.echo(payload)\n""".format(tool=tool_name),
+        """\"\"\"Dumb orchestrator.\"\"\"\n\nfrom __future__ import annotations\n\nfrom core.{tool}.application.decision_logic import compute_echo\nfrom core.{tool}.application.input_validation import build_input\nfrom core.{tool}.application.output_mapping import to_result_dict\n\n\ndef run(payload: dict) -> dict:\n    validated = build_input(payload)\n    computed = compute_echo(validated)\n    return to_result_dict(computed)\n""".format(tool=tool_name),
         encoding="utf-8",
     )
 
@@ -140,6 +162,11 @@ Document the required keys, types, and defaults for any nested config in your pa
         encoding="utf-8",
     )
 
+    (examples_dir / "edge_cases.json").write_text(
+        "{\n  \"payload\": {}\n}\n",
+        encoding="utf-8",
+    )
+
     if register:
         if not description:
             print("--register requires --description")
@@ -156,6 +183,8 @@ Document the required keys, types, and defaults for any nested config in your pa
                     "status": "active",
                     "contracts": f"core/{tool_name}/contracts.py",
                     "origin": "new",
+                    "path": f"core/{tool_name}",
+                    "icon": "tool",
                 })
                 registry["tools"] = tools
                 registry_path.write_text(json.dumps(registry, indent=2), encoding="utf-8")

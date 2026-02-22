@@ -52,7 +52,11 @@ core/                          <- Pure logic. No I/O. No frameworks.
       specs.py                 <- Constants and specifications
       schema_checklist.md      <- Required keys/types/defaults
     application/
-      service.py               <- Pure decision functions
+      input_validation.py      <- Normalize/validate payloads
+      decision_logic.py        <- Pure decision functions
+      output_mapping.py        <- Result serialization
+      service.py               <- Facade/re-exports only (optional compatibility)
+      FILE_MAP.md              <- One-line responsibility map per application file
       orchestrator.py          <- Dumb sequencer (max 60 lines, no branching)
     tests/                     <- Unit tests (no I/O needed)
     MIGRATION_MAP.md           <- Migration only: old -> new mapping
@@ -88,8 +92,14 @@ docs/                          <- Workflow docs, manifesto, integration guides.
 - **Manifesto**: `docs/manifesto/BUILDING_SOFTWARE_THAT_STAYS_SOFT.md`
 - **Integration checklist**: `docs/integration/CHECKLIST.md`
 - **UI kit**: `docs/integration/ADAPTER_UI_KIT.md`
+- **Adapter portability standard**: `docs/integration/ADAPTER_PORTABILITY.md`
 - **Agent calling conventions**: `docs/agent/INTERFACE_SPEC.md`
 - **All docs**: `docs/DOCS_INDEX.md`
+
+## Gold Reference Tool
+
+- Use `core/label_generator/application/` as the split-by-responsibility reference implementation.
+- Start at `core/label_generator/application/FILE_MAP.md` for file responsibilities.
 
 ## Install Hooks
 ```
@@ -137,3 +147,13 @@ Then open `http://localhost:8000`.
 By default, demo startup is gated by `scripts/preflight_core.py` and will fail fast if checks do not pass.
 Set `RUNTIME_GATE_FULL_REPORT=1` to run all checks before exit and get full diagnostics in one pass.
 When blocked, a JSON report is written under `.reports/`.
+
+## Code Reading Trainer
+
+Dependency-free trainer page:
+
+```
+python3 scripts/run_code_reading_trainer.py
+```
+
+Then open `http://127.0.0.1:8012/code-reading-trainer.html`.

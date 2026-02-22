@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How to Read This Codebase</title>
+  <style>
+    :root {
+      --bg: #0f1119;
+      --panel: #161822;
+      --panel-border: #1e2030;
+      --text: #e2e8f0;
+      --muted: #a0aec0;
+      --dim: #718096;
+      --faint: #4a5568;
+      --accent: #63b3ed;
+      --orange: #ed8936;
+      --green: #48bb78;
+      --blue: #63b3ed;
+      --purple: #b794f4;
+      --code-bg: #1a1a2e;
+    }
+    * { box-sizing: border-box; margin: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* Layout */
+    .app { min-height: 100vh; display: flex; flex-direction: column; }
+    .progress-bar { height: 3px; background: #1a1a2e; }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--orange), var(--green), var(--blue), var(--purple));
+      transition: width 0.4s ease;
+    }
+
+    /* Phase nav */
+    .phase-nav {
+      display: flex; justify-content: center; gap: 4px;
+      padding: 14px 16px 6px; flex-wrap: wrap;
+    }
+    .phase-pill {
+      padding: 5px 14px; border-radius: 20px; font-size: 12px;
+      font-weight: 500; color: var(--faint); cursor: pointer;
+      transition: all 0.25s; border: none; background: transparent;
+    }
+    .phase-pill.active { background: #2d3748; color: var(--text); font-weight: 700; }
+    .phase-pill.done { color: var(--green); }
+
+    /* Main content area */
+    .main {
+      flex: 1; display: flex; flex-direction: column;
+      max-width: 740px; width: 100%; margin: 0 auto;
+      padding: 12px 24px 24px;
+    }
+    .step-label {
+      font-size: 12px; font-weight: 700; color: var(--accent);
+      text-transform: uppercase; letter-spacing: 2px; margin-bottom: 6px;
+    }
+    .step-counter { color: var(--faint); margin-left: 8px; letter-spacing: normal; }
+    .title {
+      font-size: 26px; font-weight: 800; color: #f7fafc;
+      line-height: 1.2; margin-bottom: 4px;
+    }
+    .subtitle { font-size: 15px; color: var(--dim); margin-bottom: 18px; }
+
+    /* Visual panel */
+    .visual-panel {
+      background: var(--panel); border: 1px solid var(--panel-border);
+      border-radius: 16px; padding: 20px; margin-bottom: 16px;
+      min-height: 80px;
+    }
+
+    /* Description */
+    .description {
+      font-size: 15px; line-height: 1.75; color: var(--muted);
+      white-space: pre-line; flex: 1;
+    }
+    .description strong { color: var(--text); font-weight: 600; }
+    .description em { color: var(--accent); font-style: normal; }
+
+    /* Code blocks */
+    .code-block {
+      background: var(--code-bg); border-radius: 12px;
+      padding: 16px 20px; font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', ui-monospace, monospace;
+      font-size: 13px; line-height: 1.8; overflow-x: auto;
+    }
+    .code-line {
+      display: flex; gap: 14px; align-items: baseline;
+      padding: 2px 0; border-left: 3px solid transparent;
+      padding-left: 12px; margin-left: -12px; border-radius: 2px;
+    }
+    .code-line.hi {
+      background: rgba(99, 179, 237, 0.08);
+      border-left-color: var(--accent);
+    }
+    .code-line.hi-orange {
+      background: rgba(237, 137, 54, 0.08);
+      border-left-color: var(--orange);
+    }
+    .code-line.hi-green {
+      background: rgba(72, 187, 120, 0.08);
+      border-left-color: var(--green);
+    }
+    .code-line.hi-purple {
+      background: rgba(183, 148, 244, 0.08);
+      border-left-color: var(--purple);
+    }
+    .code-text { color: var(--dim); white-space: pre; flex-shrink: 0; }
+    .code-line.hi .code-text,
+    .code-line.hi-orange .code-text,
+    .code-line.hi-green .code-text,
+    .code-line.hi-purple .code-text { color: var(--text); }
+    .code-note { color: var(--accent); font-size: 12px; white-space: nowrap; opacity: 0.9; flex-shrink: 0; }
+    .code-note.orange { color: var(--orange); }
+    .code-note.green { color: var(--green); }
+    .code-note.purple { color: var(--purple); }
+
+    /* Flow diagram */
+    .flow { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 0; }
+    .flow-box {
+      border-radius: 12px; padding: 12px 28px; text-align: center;
+      min-width: 260px; border-width: 2px; border-style: solid;
+    }
+    .flow-box-name { font-weight: 700; font-size: 15px; }
+    .flow-box-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .flow-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    .flow-arrow-line { width: 2px; height: 12px; background: var(--faint); }
+    .flow-arrow-label {
+      background: #2d3748; padding: 3px 14px; border-radius: 20px;
+      font-size: 11px; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .flow-arrow-tip {
+      width: 0; height: 0;
+      border-left: 6px solid transparent; border-right: 6px solid transparent;
+      border-top: 7px solid var(--faint);
+    }
+
+    /* Sandwich */
+    .sandwich { display: flex; flex-direction: column; gap: 5px; max-width: 440px; margin: 0 auto; }
+    .sandwich-layer {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 18px; border-radius: 10px;
+      border: 1.5px solid; font-size: 14px;
+    }
+    .sandwich-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600; font-size: 13px;
+    }
+    .sandwich-type {
+      font-size: 10px; text-transform: uppercase;
+      letter-spacing: 1px; margin-top: 2px; color: var(--muted);
+    }
+
+    /* File tree */
+    .file-tree {
+      font-family: 'JetBrains Mono', monospace; font-size: 13px;
+      line-height: 1.9; padding: 4px 0;
+    }
+    .file-tree-line { display: flex; gap: 10px; }
+    .file-tree-path { color: var(--muted); }
+    .file-tree-path.active { color: var(--text); font-weight: 600; }
+    .file-tree-note { color: var(--accent); font-size: 11px; }
+
+    /* Shape cards */
+    .shape-cards { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; padding: 8px 0; }
+    .shape-card {
+      border-radius: 12px; padding: 14px 18px; text-align: center;
+      width: 130px; border: 2px solid;
+    }
+    .shape-card-icon { font-size: 24px; margin-bottom: 4px; }
+    .shape-card-name { font-weight: 700; font-size: 13px; }
+    .shape-card-desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    /* Verify layers */
+    .verify-stack { display: flex; flex-direction: column; gap: 8px; padding: 4px 0; }
+    .verify-item {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 14px; border-radius: 10px; border-left: 3px solid;
+    }
+    .verify-step { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .verify-output {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      color: var(--muted); white-space: pre-wrap;
+    }
+
+    /* Summary steps */
+    .summary-steps { display: flex; flex-direction: column; gap: 12px; padding: 4px 0; }
+    .summary-step {
+      display: flex; gap: 14px; align-items: center;
+      padding: 14px 18px; border-radius: 14px;
+      border: 2px solid; border-color: color-mix(in srgb, var(--step-color) 30%, transparent);
+      background: color-mix(in srgb, var(--step-color) 6%, transparent);
+    }
+    .summary-num {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 18px; color: white; flex-shrink: 0;
+    }
+    .summary-title { font-weight: 800; font-size: 15px; letter-spacing: 0.5px; }
+    .summary-desc { font-size: 13px; color: var(--muted); margin-top: 1px; }
+    .summary-time {
+      font-size: 11px; color: var(--dim); background: #2d3748;
+      padding: 3px 10px; border-radius: 20px; flex-shrink: 0; margin-left: auto;
+    }
+
+    /* Callout box */
+    .callout {
+      border-radius: 10px; padding: 14px 18px; margin: 8px 0;
+      border-left: 4px solid;
+    }
+    .callout-title { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+    .callout-body { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* Nav */
+    .nav {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: auto; padding-top: 16px;
+      border-top: 1px solid var(--panel-border); gap: 10px;
+    }
+    .nav-btn {
+      padding: 10px 22px; border-radius: 10px; font-size: 14px;
+      font-weight: 600; cursor: pointer; transition: all 0.2s;
+      border: 1px solid #2d3748; background: transparent; color: var(--muted);
+    }
+    .nav-btn:disabled { color: #2d3748; cursor: default; }
+    .nav-btn.primary {
+      border: none; color: white;
+      background: linear-gradient(135deg, var(--accent), #4299e1);
+    }
+    .nav-btn.primary:disabled { background: #2d3748; color: var(--faint); }
+    .dots { display: flex; gap: 4px; }
+    .dot {
+      width: 6px; height: 6px; border-radius: 3px;
+      background: #2d3748; cursor: pointer; transition: all 0.3s;
+    }
+    .dot.active { width: 20px; background: var(--accent); }
+    .dot.past { background: var(--green); }
+
+    /* Keyboard hint */
+    .kbd-hint {
+      text-align: center; padding: 6px 0; font-size: 11px; color: var(--faint);
+    }
+    kbd {
+      background: #2d3748; padding: 1px 6px; border-radius: 4px;
+      font-family: inherit; font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+  <div class="phase-nav" id="phaseNav"></div>
+  <div class="main">
+    <div class="step-label" id="stepLabel"></div>
+    <div class="title" id="title"></div>
+    <div class="subtitle" id="subtitle"></div>
+    <div class="visual-panel" id="visualPanel"></div>
+    <div class="description" id="desc"></div>
+    <div class="nav">
+      <button class="nav-btn" id="back">&larr; Back</button>
+      <div class="dots" id="dots"></div>
+      <button class="nav-btn primary" id="next">Next &rarr;</button>
+    </div>
+    <div class="kbd-hint"><kbd>&larr;</kbd> <kbd>&rarr;</kbd> arrow keys to navigate</div>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// STEP DEFINITIONS
+// ─────────────────────────────────────────────
+const STEPS = [
+
+// ━━━ WELCOME ━━━
+{
+  phase: "Welcome",
+  title: "How to Read Code Like an Architect",
+  subtitle: "A visual method for this repo \u2014 no coding experience required",
+  visual: "welcome",
+  desc: `Most people try to read code like a novel \u2014 start at the top, read every line, hope it makes sense by the end. That\u2019s why it feels overwhelming. You\u2019re drowning in details before you understand the shape of the thing.
+
+Instead, you\u2019re going to learn to read code the way you\u2019d explore a new building:
+
+<strong>First the floor plan. Then the rooms. Then the furniture.</strong>
+
+This guide uses the actual code in this repo. Everything you see here is real \u2014 from the label generator tool and the order quote tool. By the end, you\u2019ll have a repeatable 4-step method you can use every time you open any tool in this codebase.`
+},
+
+{
+  phase: "Welcome",
+  title: "What This Repo Actually Does",
+  subtitle: "Two sentences, so you have context",
+  visual: "repo-overview",
+  desc: `This repo contains <strong>business tools</strong> \u2014 things like generating Avery 5160 mailing labels from a spreadsheet, or calculating order quotes with discounts and tax.
+
+Each tool is split into two halves:
+\u2022 <em>core/</em> \u2014 the brain. Pure math and logic. Doesn\u2019t touch files, databases, or the web.
+\u2022 <em>adapters/</em> \u2014 the hands. Reads files, renders PDFs, handles web requests.
+
+This split is the single most important thing about the codebase. Everything else flows from it. The method you\u2019re about to learn works <strong>because</strong> of this split.`
+},
+
+// ━━━ STEP 1: SHAPES ━━━
+{
+  phase: "Shapes",
+  title: "Read the Data Shapes First",
+  subtitle: "Learn the nouns before the verbs",
+  visual: "shapes-overview",
+  desc: `Every tool in this repo has a file called <strong>domain/models.py</strong>. It contains <em>dataclasses</em> \u2014 which are just descriptions of the shapes of data that flow through the program.
+
+Think of them as forms. A doctor\u2019s office has forms: patient intake form, prescription form, referral form. Each form has specific fields. You don\u2019t need to understand medicine to read the forms \u2014 the field names tell you what kind of information flows through the system.
+
+Dataclasses work exactly the same way. Read the names. Read the fields. You\u2019ll understand what the program deals with before you see a single line of logic.`
+},
+
+{
+  phase: "Shapes",
+  title: "LabelFieldConfig \u2014 How a field should look",
+  subtitle: "core/label_generator/domain/models.py",
+  visual: "code",
+  code: [
+    ["@dataclass",                       "",      ""],
+    ["class LabelFieldConfig:",          "blue",  "\u2190 Configuration for ONE field on a label"],
+    ["    column: str | None",           "",      "Which spreadsheet column to pull from"],
+    ["    y_in: float",                  "",      "Vertical position in inches"],
+    ["    align: str",                   "",      "left, center, or right"],
+    ["    font_family: str",             "",      ""],
+    ["    font_weight: str",             "",      "Regular or Bold"],
+    ["    size_pt: float",               "",      "Font size in points"],
+    ["    letter_spacing: float",        "",      ""],
+    ["    is_static: bool",              "blue",  "Static = same text on every label"],
+    ["    static_text: str",             "",      "The fixed text (if static)"],
+    ["    prefix: str",                  "",      'e.g. \"Tel: \" before a phone number'],
+    ["    suffix: str",                  "",      ""],
+    ["    is_header: bool",              "blue",  "Headers get UPPERCASE + Bold"],
+  ],
+  desc: `This is the configuration for a single field on a label. Not the data itself \u2014 the <strong>design spec</strong> for how one piece of text should appear.
+
+Imagine you\u2019re designing a mailing label in a word processor. You\u2019d set: which column from my spreadsheet? what font? what size? where on the label? That\u2019s exactly what this dataclass captures.
+
+Notice: there\u2019s nothing here about PDFs, files, or web requests. It\u2019s just a description of intent.`
+},
+
+{
+  phase: "Shapes",
+  title: "LabelJob \u2014 Everything needed for one run",
+  subtitle: "The complete input to the brain",
+  visual: "code",
+  code: [
+    ["@dataclass",                       "",      ""],
+    ["class LabelJob:",                  "blue",  "\u2190 One complete label generation request"],
+    ["    sheet_name: str",              "",      "Which worksheet to use"],
+    ["    rows: list[dict[str, Any]]",   "blue",  "\u2190 The actual spreadsheet data"],
+    ["    fields: list[LabelFieldConfig]","blue", "\u2190 How to design each field"],
+    ["    copies_per_record: int",       "",      "Print 2 copies of each? 5?"],
+    ["    use_template: bool",           "",      "Overlay on Avery template?"],
+    ["    timestamp_utc: str",           "",      "For the download filename"],
+  ],
+  desc: `This is the <strong>complete input</strong> to the label generator\u2019s brain. It contains everything the logic needs to make decisions: the data, the design, and the options.
+
+Think of it as a work order. A print shop gets a work order that says: \u201cHere\u2019s the spreadsheet, here\u2019s how each field should look, make 3 copies each, use this template.\u201d That\u2019s a LabelJob.
+
+Key insight: the rows are already loaded. This shape doesn\u2019t know if they came from Excel, CSV, a database, or a web form. <strong>The brain doesn\u2019t care where data comes from.</strong>`
+},
+
+{
+  phase: "Shapes",
+  title: "RenderPlan \u2014 What the brain produces",
+  subtitle: "The complete output \u2014 ready for any renderer",
+  visual: "code",
+  code: [
+    ["@dataclass",                       "",       ""],
+    ["class RenderPlan:",                "green",  "\u2190 The brain\u2019s complete output"],
+    ["    input_rows: int",              "",       "How many rows came in"],
+    ["    filtered_rows: int",           "",       "How many survived filtering"],
+    ["    total_labels: int",            "green",  "\u2190 After copies expansion"],
+    ["    labels_per_page: int",         "",       "30 for Avery 5160"],
+    ["    slots: list[LabelSlot]",       "green",  "\u2190 Every label, positioned on a page"],
+  ],
+  desc: `This is what the brain produces. Not a PDF \u2014 a <strong>plan</strong>. It says: \u201cHere are 90 labels. Each one goes at these exact coordinates on these pages. Here\u2019s the text for each one, already formatted.\u201d
+
+The adapter (the hands) takes this plan and renders it into a real PDF. But the plan itself is pure information. You could render it to PDF, HTML, a printer API, or just display it on screen.
+
+This is why the split matters: <strong>the brain computes, the hands render</strong>. Change the renderer without touching the logic. Change the logic without touching the renderer.`
+},
+
+{
+  phase: "Shapes",
+  title: "The Data Flow \u2014 You Already Know the Story",
+  subtitle: "Just from reading four dataclasses",
+  visual: "flow-labels",
+  desc: `Without reading a single function, you now know:
+
+\u2022 Raw spreadsheet rows come in
+\u2022 They get bundled with design config into a <em>LabelJob</em>
+\u2022 The brain produces a <em>RenderPlan</em> with positioned, formatted slots
+\u2022 Something renders that plan into a PDF
+
+<strong>You\u2019ve read zero logic and you already know the story.</strong>
+
+This works because the code was designed so that the data shapes ARE the story. The shapes are the nouns; the functions are just verbs that transform one noun into another.`
+},
+
+{
+  phase: "Shapes",
+  title: "Bonus: Order Quote Shapes",
+  subtitle: "The same pattern, completely different domain",
+  visual: "code",
+  code: [
+    ["# core/order_quote/domain/models.py", "",      ""],
+    ["",                                  "",      ""],
+    ["class LineItem:",                   "orange","What\u2019s being purchased"],
+    ["    sku: str",                      "",      ""],
+    ["    quantity: int",                 "",      ""],
+    ["    unit_price_cents: int",         "orange","Prices in cents \u2014 no decimals!"],
+    ["",                                  "",      ""],
+    ["class QuoteRequest:",               "blue",  "Complete input (like LabelJob)"],
+    ["    items: list[LineItem]",         "",      ""],
+    ["    state: str",                    "",      "For tax calculation"],
+    ["    coupon_code: str | None",       "",      ""],
+    ["",                                  "",      ""],
+    ["class QuoteBreakdown:",             "green", "Complete output (like RenderPlan)"],
+    ["    subtotal_cents: int",           "",      ""],
+    ["    discount_bps: int",            "",      "Basis points (500 = 5%)"],
+    ["    shipping_cents: int",           "",      ""],
+    ["    tax_cents: int",                "",      ""],
+    ["    total_cents: int",              "green", "The final answer"],
+  ],
+  desc: `Completely different tool \u2014 same pattern. Input shape, output shape, everything in between is pure math.
+
+Notice the discipline: prices are in <em>cents</em> (integers), not dollars (decimals). Discounts are in <em>basis points</em> (500 = 5%), not percentages (floats). This avoids floating-point rounding bugs. That\u2019s a <strong>decision</strong> captured right in the data shape.
+
+Once you\u2019ve read one tool\u2019s models.py, you know how to read any tool\u2019s models.py. The pattern is always: <strong>input shape \u2192 output shape</strong>.`
+},
+
+// ━━━ STEP 2: ORCHESTRATOR ━━━
+{
+  phase: "Plot",
+  title: "Read the Orchestrator Second",
+  subtitle: "The table of contents for your program",
+  visual: "orchestrator-intro",
+  desc: `Now that you know the nouns, it\u2019s time to learn the plot.
+
+Every tool has a file called <strong>application/orchestrator.py</strong>. It\u2019s the shortest file in the entire tool. In this repo, orchestrators are typically <strong>3 lines long</strong>.
+
+The orchestrator is a recipe card. It says: \u201cDo step 1, then step 2, then step 3.\u201d It contains no logic of its own. It doesn\u2019t know HOW any step works \u2014 it just calls them in order.
+
+When you read the orchestrator, you\u2019re reading the <strong>entire plot</strong> of the program in 3 lines.`
+},
+
+{
+  phase: "Plot",
+  title: "Label Generator Orchestrator",
+  subtitle: "core/label_generator/application/orchestrator.py \u2014 the whole file",
+  visual: "code",
+  code: [
+    ["def run(payload):",                 "",       "Takes raw input dict"],
+    ["",                                  "",       ""],
+    ["    job = service.build_job(payload)",     "orange", "\u2190 Step 1: Validate + normalize input"],
+    ["",                                  "",       ""],
+    ["    plan = service.compute_plan(job)",     "green",  "\u2190 Step 2: All the decisions happen here"],
+    ["",                                  "",       ""],
+    ["    return service.to_result_dict(job, plan)", "purple", "\u2190 Step 3: Format the output"],
+  ],
+  desc: `That\u2019s it. That\u2019s the entire program.
+
+<strong>Line 1:</strong> Take the raw payload and validate it. If anything\u2019s wrong (missing fields, bad types), it fails here. If it passes, you get a clean <em>LabelJob</em>.
+
+<strong>Line 2:</strong> Take the validated job and compute the plan. This is where all the interesting decisions happen \u2014 filtering blank rows, expanding copies, calculating positions. Out comes a <em>RenderPlan</em>.
+
+<strong>Line 3:</strong> Take the job and plan and format them into a result dictionary that the adapter can use.
+
+Every tool in this repo follows this same 3-act structure: <strong>validate \u2192 decide \u2192 format output</strong>.`
+},
+
+{
+  phase: "Plot",
+  title: "Order Quote Orchestrator",
+  subtitle: "Exact same pattern, different tool",
+  visual: "code",
+  code: [
+    ["def run(payload):",                 "",       ""],
+    ["",                                  "",       ""],
+    ["    request = service.build_request(payload)",    "orange", "\u2190 Validate: items, state, coupon"],
+    ["",                                  "",       ""],
+    ["    breakdown = service.build_breakdown(request)","green",  "\u2190 Decide: pricing, discounts, tax"],
+    ["",                                  "",       ""],
+    ["    return service.to_result_dict(breakdown)",    "purple", "\u2190 Format: serialize to dict"],
+  ],
+  desc: `See the pattern? Different domain, identical structure.
+
+Once you\u2019ve read one orchestrator, you can read every orchestrator in this repo in about 5 seconds. You just read the function names and you know the plot.
+
+This is by design. The repo has an automated check (<em>check_orchestrator_dumb.py</em>) that enforces: no if-statements, no loops, no try/except, maximum 60 lines. If someone tries to put logic in the orchestrator, the check fails and the code can\u2019t be committed.
+
+The orchestrator is <strong>structurally guaranteed</strong> to be simple.`
+},
+
+{
+  phase: "Plot",
+  title: "See the Sandwich",
+  subtitle: "The universal pattern hiding in every orchestrator",
+  visual: "sandwich",
+  desc: `Every well-structured program follows the same shape \u2014 a sandwich:
+
+The bread on top is <strong>plumbing</strong> (reading input).
+The filling is <strong>decisions</strong> (pure logic).
+The bread on bottom is <strong>plumbing</strong> (writing output).
+
+In this repo, the core orchestrator is just the filling \u2014 pure decisions. The bread lives in the <em>adapter layer</em> (reading Excel files, rendering PDFs, handling HTTP).
+
+When someone asks \u201ccan we also read from Google Sheets?\u201d \u2014 you change the bread. The filling doesn\u2019t know or care.
+
+When someone asks \u201ccan we change the label positioning logic?\u201d \u2014 you change the filling. The bread doesn\u2019t know or care.`
+},
+
+// ━━━ STEP 3: ZOOM ━━━
+{
+  phase: "Zoom",
+  title: "Read Functions Only When You Need To",
+  subtitle: "You never need to read the whole codebase",
+  visual: "file-map",
+  desc: `Each tool has a <strong>FILE_MAP.md</strong> that tells you what lives where:
+
+\u2022 <em>input_validation.py</em> \u2014 Is the input valid? Normalize it.
+\u2022 <em>planning.py</em> \u2014 Filter rows, expand copies, assign positions.
+\u2022 <em>output_format.py</em> \u2014 Build the download filename, serialize the result.
+\u2022 <em>orchestrator.py</em> \u2014 Call the above three in sequence.
+
+You <strong>never open a file without a specific question</strong>:
+
+\u201cWhy are blank rows getting through?\u201d \u2192 Open planning.py, find _filter_rows.
+\u201cWhy is the filename wrong?\u201d \u2192 Open output_format.py, find _download_name.
+\u201cWhy is the y-position rejected?\u201d \u2192 Open input_validation.py, find the y_in check.
+
+Each file is under 160 lines. Each function is under 40 lines. You\u2019re never reading more than you need.`
+},
+
+{
+  phase: "Zoom",
+  title: "Example: How Label Positions Are Calculated",
+  subtitle: "core/label_generator/application/planning.py",
+  visual: "code",
+  code: [
+    ["def _slot_coordinates(slot_index):",      "blue",   "Given a slot number, where does it go?"],
+    ["    rows = int(AVERY_5160[\"rows\"])",     "",       "10 rows per column on Avery 5160"],
+    ["    col = slot_index // rows",             "blue",   "\u2190 Slots 0-9 = column 0, 10-19 = column 1, etc."],
+    ["    row = slot_index % rows",              "blue",   "\u2190 Position within the column"],
+    ["    x_in = left_margin + col * (label_width + gap)", "", "Horizontal position"],
+    ["    y_in = page_height - top_margin - (row+1) * label_height", "", "Vertical (PDF y-axis is flipped)"],
+    ["    return col, row, x_in, y_in",          "blue",   "\u2190 That\u2019s it. Pure math."],
+  ],
+  desc: `This function takes a number (which slot on the page?) and returns coordinates (where on the page?). It\u2019s pure math. No files, no PDF library, no web framework.
+
+The fill order is <strong>top-down by column</strong>: slots 0\u20139 fill the left column top to bottom, 10\u201319 fill the middle column, 20\u201329 fill the right column. This matches how Avery 5160 sheets are typically printed.
+
+Notice: this function has no idea it\u2019s going to be used in a PDF. It just computes coordinates. You could use these same coordinates to render labels on a webpage, a printer API, or an SVG. <strong>The decision is separate from the output format.</strong>`
+},
+
+{
+  phase: "Zoom",
+  title: "Example: How Text Gets Prepared",
+  subtitle: "What happens to each field before rendering",
+  visual: "code",
+  code: [
+    ["def _resolve_text(row, field):",           "",       "For one field of one label:"],
+    ["    if field.is_static:",                  "orange", "\u2190 Static? Use the fixed text"],
+    ["        raw_text = field.static_text",      "",      ""],
+    ["    else:",                                 "",      ""],
+    ["        value = row.get(field.column, \"\")", "blue",  "\u2190 Dynamic? Pull from spreadsheet"],
+    ["        # handle NaN, empty, etc.",         "",       ""],
+    ["        if raw_text.strip():",              "",       ""],
+    ["            raw_text = prefix + raw_text + suffix", "blue", "\u2190 Add prefix/suffix if non-empty"],
+    ["    if field.is_header:",                   "green",  "\u2190 Header? Force UPPERCASE"],
+    ["        return text.upper()",               "",       ""],
+    ["    return text",                           "",       ""],
+  ],
+  desc: `This function makes four decisions for each field:
+1. Is it static (same on every label) or dynamic (from the spreadsheet)?
+2. If dynamic, is the value empty? If so, skip the prefix/suffix.
+3. Is it a header? If so, uppercase it.
+4. Is the final result empty? If so, skip it entirely.
+
+That\u2019s the kind of thing you\u2019d describe in plain English to someone at a print shop. And that\u2019s exactly what this code does \u2014 it\u2019s just the English translated into Python.
+
+<strong>You don\u2019t need to be a coder to read this.</strong> If you can follow the if/else logic of a recipe (\u201cif the butter is salted, skip the extra salt\u201d), you can follow this.`
+},
+
+// ━━━ STEP 4: VERIFY ━━━
+{
+  phase: "Verify",
+  title: "Verify with Your Eyes",
+  subtitle: "You don\u2019t have to just trust the code \u2014 look at the data",
+  visual: "verify-layers",
+  desc: `Here\u2019s the secret that nobody tells non-coders: you can verify each stage <strong>visually</strong>. Because the code is split into stages, you can look at the data between stages and check if it makes sense.
+
+Think of it like a cooking show. You don\u2019t just trust that the souffl\u00e9 will work \u2014 you check the batter before it goes in the oven. You check the oven temperature. You check the rise through the glass.
+
+In this codebase, the \u201cstages\u201d are the function calls in the orchestrator. After each one, the data has a specific shape you can inspect.`
+},
+
+{
+  phase: "Verify",
+  title: "What to Check at Each Layer",
+  subtitle: "From raw input to final PDF",
+  visual: "verify-detail",
+  desc: `<strong>Layer 1: Input payload</strong>
+Check the example files: <em>core/label_generator/examples/happy_path.json</em>
+Does the payload structure make sense? Do the field names match what you expect?
+
+<strong>Layer 2: After build_job</strong>
+Is the LabelJob valid? Were bad rows rejected? Are field configs normalized?
+You can test this by calling build_job directly with a sample payload.
+
+<strong>Layer 3: After compute_plan</strong>
+Does the RenderPlan have the right number of slots? Are coordinates reasonable?
+filtered_rows should be \u2264 input_rows. total_labels should be filtered_rows \u00d7 copies.
+
+<strong>Layer 4: After to_result_dict</strong>
+Is the download name correct? Does the slot data serialize cleanly?
+
+<strong>Layer 5: Adapter output</strong>
+Open the actual PDF. Do labels appear where the coordinates say they should?
+
+Each layer is independently checkable because each layer produces <strong>plain data</strong> you can print and inspect.`
+},
+
+{
+  phase: "Verify",
+  title: "The Adapter Boundary",
+  subtitle: "Where the brain meets the hands",
+  visual: "code",
+  code: [
+    ["# adapters/flask/label_generator/app.py",      "",       ""],
+    ["# Inside the /generate route:",                 "",       ""],
+    ["",                                              "",       ""],
+    ["payload = presenter.build_generate_payload(body, rows)", "orange", "Translate HTTP \u2192 core format"],
+    ["",                                              "",       ""],
+    ["result = run_contract(ToolInput(payload=payload)).result", "green", "Call the brain \u2014 pure decisions"],
+    ["",                                              "",       ""],
+    ["io.render_plan_to_pdf(result, labels_pdf)",     "purple", "Render the plan to actual PDF"],
+    ["",                                              "",       ""],
+    ["return io.pdf_response(output_path, ...)",      "purple", "Send file to browser"],
+  ],
+  desc: `This is the adapter \u2014 the hands. Look at how it works:
+
+<strong>presenter.py</strong> translates from \u201cweb request language\u201d to \u201ccore language.\u201d It parses HTTP bodies and builds the payload dict that the core expects.
+
+<strong>run_contract()</strong> calls the brain. The adapter doesn\u2019t know what happens inside. It sends in a payload and gets back a result dict.
+
+<strong>io.py</strong> does all the messy real-world stuff: reading Excel files with pandas, rendering PDFs with reportlab, merging with Avery templates with pypdf, sending files to the browser.
+
+The adapter is <strong>allowed to be messy</strong>. It\u2019s glue code. What matters is that the core stays clean \u2014 and it does, because 21 automated checks enforce it.`
+},
+
+// ━━━ EXERCISE ━━━
+{
+  phase: "Practice",
+  title: "Try It: Find Why Labels Fill Top-Down",
+  subtitle: "A real reading exercise using the method",
+  visual: "exercise",
+  desc: `Someone asks: <strong>\u201cWhy do labels fill the left column first (top to bottom), then the middle column, then the right?\u201d</strong>
+
+Use the 4-step method:
+
+<strong>Step 1 \u2014 Shapes:</strong> LabelSlot has column_index, row_index, x_in, y_in. So position is determined per-slot.
+
+<strong>Step 2 \u2014 Orchestrator:</strong> compute_plan(job) is where positioning happens. That\u2019s in planning.py.
+
+<strong>Step 3 \u2014 Zoom:</strong> Open planning.py. Find _slot_coordinates. See:
+  col = slot_index // 10
+  row = slot_index % 10
+Slot 0\u21929 \u2192 col 0. Slot 10\u219219 \u2192 col 1. Top-down by column.
+
+<strong>Step 4 \u2014 Verify:</strong> Run the contract with 12 rows. Check that slots 0\u20139 have column_index=0, slot 10 has column_index=1, slot 11 has column_index=1.
+
+You found the answer by reading <strong>3 lines of code</strong> in one file. Not the whole codebase. Not even the whole file. Just the function that answers your question.`
+},
+
+{
+  phase: "Practice",
+  title: "Try It: Why Does Discount Cap at 15%?",
+  subtitle: "Same method, different tool",
+  visual: "exercise-2",
+  desc: `Someone asks: <strong>\u201cA customer has a $1000 order with a SAVE10 coupon. Why isn\u2019t the discount more than 15%?\u201d</strong>
+
+<strong>Step 1 \u2014 Shapes:</strong> QuoteBreakdown has discount_bps (basis points). 1500 bps = 15%.
+
+<strong>Step 2 \u2014 Orchestrator:</strong> build_breakdown(request) is where pricing happens. That\u2019s in quote_calculation.py.
+
+<strong>Step 3 \u2014 Zoom:</strong> Open quote_calculation.py. Find effective_discount_bps. See:
+  tier_bps + coupon_bps, capped at MAX_DISCOUNT_BPS (1500).
+$1000 order gets 1000 tier bps + 1000 coupon bps = 2000, but capped to 1500.
+
+<strong>Step 4 \u2014 Verify:</strong> Check specs.py: MAX_DISCOUNT_BPS = 1_500. Confirmed.
+
+Again \u2014 <strong>3 lines in one file</strong>. The shapes told you where to look, the orchestrator told you which file, and you zoomed straight to the answer.`
+},
+
+// ━━━ SUMMARY ━━━
+{
+  phase: "Method",
+  title: "The 4-Step Reading Method",
+  subtitle: "Your new habit, every time you open a tool",
+  visual: "summary",
+  desc: `You never need to read the whole codebase. You never need to understand every line. You just need to know the <strong>shapes</strong>, the <strong>flow</strong>, and how to <strong>zoom</strong> into the part you care about.
+
+This method works because the code was built to be read this way. The separation of decisions from plumbing, the dumb orchestrator, the plain data shapes at every boundary \u2014 these aren\u2019t just engineering preferences. They\u2019re what makes the code <strong>navigable by humans</strong>.
+
+You\u2019re not pretending to understand the code. You actually do. The shapes are the real story. Everything else is just details you can zoom into when you need them.`
+},
+
+{
+  phase: "Method",
+  title: "Quick Reference",
+  subtitle: "Keep this in your back pocket",
+  visual: "reference",
+  desc: `<strong>To understand a new tool:</strong>
+1. Read domain/models.py (2 min)
+2. Read application/orchestrator.py (30 sec)
+3. Skim application/FILE_MAP.md (30 sec)
+
+<strong>To investigate a bug or behavior:</strong>
+1. Identify which stage it\u2019s in (input? decision? output?)
+2. Open the one file responsible
+3. Find the one function that answers your question
+4. Verify by checking the data at that stage
+
+<strong>To understand the adapter:</strong>
+1. Read UI_CONTRACT.md for routes and payload shapes
+2. Read presenter.py for HTTP-to-core translation
+3. Read io.py only if you need to understand rendering details
+
+<strong>Files you can always ignore:</strong>
+\u2022 service.py (just re-exports, skip it)
+\u2022 contracts.py (just the wrapper, read the orchestrator instead)
+\u2022 specs.py (constants \u2014 check when you need a specific value)`
+},
+]; // end STEPS
+
+
+// ─────────────────────────────────────────────
+// VISUAL RENDERERS
+// ─────────────────────────────────────────────
+
+function renderVisual(step) {
+  const v = step.visual;
+  if (v === "code") return renderCode(step.code);
+  if (v === "welcome") return renderWelcome();
+  if (v === "repo-overview") return renderRepoOverview();
+  if (v === "shapes-overview") return renderShapesOverview();
+  if (v === "flow-labels") return renderFlowLabels();
+  if (v === "orchestrator-intro") return renderOrchIntro();
+  if (v === "sandwich") return renderSandwich();
+  if (v === "file-map") return renderFileMap();
+  if (v === "verify-layers") return renderVerifyLayers();
+  if (v === "verify-detail") return renderVerifyDetail();
+  if (v === "exercise") return renderExercise("label");
+  if (v === "exercise-2") return renderExercise("quote");
+  if (v === "summary") return renderSummary();
+  if (v === "reference") return renderReference();
+  return "";
+}
+
+function renderCode(lines) {
+  if (!lines) return "";
+  const colorMap = { blue: "hi", orange: "hi-orange", green: "hi-green", purple: "hi-purple" };
+  const noteColorMap = { blue: "", orange: "orange", green: "green", purple: "purple" };
+  return `<div class="code-block">${lines.map(([text, color, note]) => {
+    const cls = color ? colorMap[color] || "hi" : "";
+    const noteCls = color ? noteColorMap[color] || "" : "";
+    return `<div class="code-line ${cls}"><span class="code-text">${esc(text) || " "}</span>${note ? `<span class="code-note ${noteCls}">${esc(note)}</span>` : ""}</div>`;
+  }).join("")}</div>`;
+}
+
+function renderWelcome() {
+  return `<div style="text-align:center;padding:24px 16px">
+    <div style="font-size:42px;margin-bottom:12px">&#x1F3D7;&#xFE0F;</div>
+    <div style="font-size:14px;color:var(--dim);max-width:320px;margin:0 auto;line-height:1.7">
+      A building makes sense from the floor plan.<br>
+      Code makes sense from the <strong style="color:var(--text)">data shapes</strong>.
+    </div>
+  </div>`;
+}
+
+function renderRepoOverview() {
+  return `<div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;padding:16px 0">
+    <div style="flex:1;min-width:180px;max-width:260px;border:2px solid var(--green);border-radius:12px;padding:16px;background:rgba(72,187,120,0.06)">
+      <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:8px">core/ &mdash; The Brain</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Pure logic. No files, no web, no PDF.<br>
+        <span style="color:var(--dim)">models.py, planning.py, orchestrator.py</span>
+      </div>
+    </div>
+    <div style="font-size:24px;color:var(--faint);align-self:center">&harr;</div>
+    <div style="flex:1;min-width:180px;max-width:260px;border:2px solid var(--orange);border-radius:12px;padding:16px;background:rgba(237,137,54,0.06)">
+      <div style="font-size:13px;font-weight:700;color:var(--orange);margin-bottom:8px">adapters/ &mdash; The Hands</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6">
+        Files, PDFs, web requests.<br>
+        <span style="color:var(--dim)">app.py, io.py, presenter.py</span>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderShapesOverview() {
+  const shapes = [
+    { name: "LabelFieldConfig", desc: "Design for one field", color: "var(--blue)", icon: "&#x1F3A8;" },
+    { name: "LabelJob", desc: "Complete work order", color: "var(--orange)", icon: "&#x1F4CB;" },
+    { name: "LabelSlot", desc: "One label, positioned", color: "var(--purple)", icon: "&#x1F4CD;" },
+    { name: "RenderPlan", desc: "All labels, all pages", color: "var(--green)", icon: "&#x1F4D0;" },
+  ];
+  return `<div class="shape-cards">${shapes.map(s =>
+    `<div class="shape-card" style="border-color:${s.color};background:${s.color}10">
+      <div class="shape-card-icon">${s.icon}</div>
+      <div class="shape-card-name" style="color:${s.color}">${s.name}</div>
+      <div class="shape-card-desc">${s.desc}</div>
+    </div>`
+  ).join("")}</div>
+  <div style="text-align:center;font-size:12px;color:var(--dim);margin-top:8px">These are the <strong style="color:var(--text)">nouns</strong> of the label generator</div>`;
+}
+
+function renderFlowLabels() {
+  const items = [
+    { box: true, name: "Spreadsheet Rows", desc: "Raw data from Excel", color: "var(--orange)", icon: "&#x1F4CA;" },
+    { arrow: true, label: "build_job()" },
+    { box: true, name: "LabelJob", desc: "Validated work order", color: "var(--blue)", icon: "&#x1F4CB;" },
+    { arrow: true, label: "compute_plan()" },
+    { box: true, name: "RenderPlan", desc: "Positioned, formatted labels", color: "var(--green)", icon: "&#x1F4D0;" },
+    { arrow: true, label: "adapter renders" },
+    { box: true, name: "PDF File", desc: "Physical output", color: "var(--purple)", icon: "&#x1F4C4;" },
+  ];
+  return `<div class="flow">${items.map(item => {
+    if (item.arrow) return `<div class="flow-arrow"><div class="flow-arrow-line"></div><div class="flow-arrow-label">${item.label}</div><div class="flow-arrow-tip"></div></div>`;
+    return `<div class="flow-box" style="border-color:${item.color};background:${item.color}0d">
+      <div style="font-size:18px">${item.icon}</div>
+      <div class="flow-box-name" style="color:${item.color}">${item.name}</div>
+      <div class="flow-box-desc">${item.desc}</div>
+    </div>`;
+  }).join("")}</div>`;
+}
+
+function renderOrchIntro() {
+  return `<div style="text-align:center;padding:20px 16px">
+    <div style="font-size:42px;margin-bottom:10px">&#x1F4D6;</div>
+    <div style="font-size:28px;font-weight:800;color:var(--text);margin-bottom:8px">3 lines</div>
+    <div style="font-size:14px;color:var(--dim);max-width:340px;margin:0 auto;line-height:1.7">
+      Every orchestrator in this repo is 3 lines.<br>
+      Validate &rarr; Decide &rarr; Format output.<br>
+      That <em style="color:var(--accent)">is</em> the program.
+    </div>
+  </div>`;
+}
+
+function renderSandwich() {
+  const layers = [
+    { label: "adapter reads Excel file", type: "Plumbing", color: "var(--orange)", icon: "&#x1F4E5;" },
+    { label: "build_job(payload)", type: "Decision", color: "var(--green)", icon: "&#x1F9E0;" },
+    { label: "compute_plan(job)", type: "Decision", color: "var(--green)", icon: "&#x1F9E0;" },
+    { label: "to_result_dict(job, plan)", type: "Decision", color: "var(--green)", icon: "&#x1F9E0;" },
+    { label: "adapter renders PDF", type: "Plumbing", color: "var(--orange)", icon: "&#x1F4E4;" },
+  ];
+  return `<div class="sandwich">${layers.map(l =>
+    `<div class="sandwich-layer" style="border-color:${l.color};background:${l.color}0a">
+      <span style="font-size:20px">${l.icon}</span>
+      <div>
+        <div class="sandwich-label" style="color:${l.color}">${l.label}</div>
+        <div class="sandwich-type">${l.type}</div>
+      </div>
+    </div>`
+  ).join("")}</div>`;
+}
+
+function renderFileMap() {
+  const files = [
+    { path: "application/", note: "", active: false },
+    { path: "  input_validation.py", note: "Is the payload valid?", active: true },
+    { path: "  planning.py", note: "Filter, expand, position", active: true },
+    { path: "  output_format.py", note: "Filename + serialization", active: true },
+    { path: "  orchestrator.py", note: "3-line recipe", active: true },
+    { path: "  service.py", note: "(just re-exports, skip it)", active: false },
+    { path: "  FILE_MAP.md", note: "This map!", active: true },
+  ];
+  return `<div class="file-tree">${files.map(f =>
+    `<div class="file-tree-line">
+      <span class="file-tree-path ${f.active ? "active" : ""}">${esc(f.path)}</span>
+      <span class="file-tree-note">${f.note}</span>
+    </div>`
+  ).join("")}</div>`;
+}
+
+function renderVerifyLayers() {
+  const layers = [
+    { step: "After build_job", output: "LabelJob with 47 rows, 5 fields, 2 copies", icon: "&#x1F4CB;", color: "var(--orange)" },
+    { step: "After compute_plan", output: "RenderPlan: 42 filtered, 84 labels, 3 pages\nSlot 0: page=0, col=0, row=0, x=0.175, y=9.5", icon: "&#x1F4D0;", color: "var(--green)" },
+    { step: "After to_result_dict", output: 'download_name: "labels_sheet1_name_20260221_1430.pdf"\nslots: [{page_index: 0, x_in: 0.175, ...}, ...]', icon: "&#x1F4E6;", color: "var(--blue)" },
+    { step: "After adapter renders", output: "Open the PDF. Labels at correct positions? Text readable?", icon: "&#x1F441;&#xFE0F;", color: "var(--purple)" },
+  ];
+  return `<div class="verify-stack">${layers.map(l =>
+    `<div class="verify-item" style="border-left-color:${l.color};background:${l.color}08">
+      <span style="font-size:22px;flex-shrink:0;line-height:1">${l.icon}</span>
+      <div>
+        <div class="verify-step" style="color:${l.color}">${l.step}</div>
+        <div class="verify-output">${esc(l.output)}</div>
+      </div>
+    </div>`
+  ).join("")}</div>`;
+}
+
+function renderVerifyDetail() {
+  return `<div style="text-align:center;padding:16px">
+    <div style="display:inline-flex;flex-direction:column;gap:10px;text-align:left">
+      ${["examples/happy_path.json", "build_job(payload)", "compute_plan(job)", "to_result_dict(job, plan)", "Open the PDF"].map((step, i) =>
+        `<div style="display:flex;align-items:center;gap:10px">
+          <div style="width:28px;height:28px;border-radius:50%;background:${["var(--orange)","var(--orange)","var(--green)","var(--blue)","var(--purple)"][i]};color:white;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0">${i+1}</div>
+          <div style="font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted)">${step}</div>
+        </div>`
+      ).join("")}
+    </div>
+  </div>`;
+}
+
+function renderExercise(type) {
+  const color = type === "label" ? "var(--green)" : "var(--blue)";
+  const icon = type === "label" ? "&#x1F50D;" : "&#x1F4B0;";
+  const question = type === "label"
+    ? "Why do labels fill top-down by column?"
+    : "Why is the discount capped at 15%?";
+  return `<div style="text-align:center;padding:20px 16px">
+    <div style="font-size:36px;margin-bottom:8px">${icon}</div>
+    <div style="font-size:16px;font-weight:700;color:${color};margin-bottom:6px">Reading Exercise</div>
+    <div style="font-size:14px;color:var(--muted);max-width:360px;margin:0 auto;line-height:1.6">
+      "${question}"<br>
+      <span style="font-size:12px;color:var(--dim)">Follow the 4 steps below to find the answer.</span>
+    </div>
+  </div>`;
+}
+
+function renderSummary() {
+  const steps = [
+    { num: "1", title: "SHAPES", desc: "Read models.py. Learn the nouns.", color: "var(--orange)", time: "2 min" },
+    { num: "2", title: "PLOT", desc: "Read orchestrator.py. Learn the flow.", color: "var(--green)", time: "30 sec" },
+    { num: "3", title: "ZOOM", desc: "Open one file to answer your question.", color: "var(--blue)", time: "As needed" },
+    { num: "4", title: "VERIFY", desc: "Check the data between stages.", color: "var(--purple)", time: "5 min" },
+  ];
+  return `<div class="summary-steps">${steps.map(s =>
+    `<div class="summary-step" style="--step-color:${s.color}">
+      <div class="summary-num" style="background:${s.color}">${s.num}</div>
+      <div style="flex:1">
+        <div class="summary-title" style="color:${s.color}">${s.title}</div>
+        <div class="summary-desc">${s.desc}</div>
+      </div>
+      <div class="summary-time">${s.time}</div>
+    </div>`
+  ).join("")}</div>`;
+}
+
+function renderReference() {
+  return `<div style="display:flex;flex-direction:column;gap:10px;padding:4px 0">
+    ${[
+      { title: "Understand a tool", files: "models.py \u2192 orchestrator.py \u2192 FILE_MAP.md", color: "var(--green)" },
+      { title: "Investigate a bug", files: "Identify stage \u2192 open one file \u2192 find one function", color: "var(--blue)" },
+      { title: "Understand the adapter", files: "UI_CONTRACT.md \u2192 presenter.py \u2192 io.py", color: "var(--orange)" },
+    ].map(r =>
+      `<div style="padding:12px 16px;border-radius:10px;border-left:3px solid ${r.color};background:${r.color}08">
+        <div style="font-size:13px;font-weight:700;color:${r.color}">${r.title}</div>
+        <div style="font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:3px">${r.files}</div>
+      </div>`
+    ).join("")}
+  </div>`;
+}
+
+
+// ─────────────────────────────────────────────
+// APP ENGINE
+// ─────────────────────────────────────────────
+
+const PHASES = ["Welcome", "Shapes", "Plot", "Zoom", "Verify", "Practice", "Method"];
+const PHASE_LABELS = {
+  Welcome: "Start", Shapes: "Data Shapes", Plot: "Orchestrator",
+  Zoom: "Functions", Verify: "Verify", Practice: "Exercises", Method: "Method"
+};
+
+let current = 0;
+
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function render() {
+  const step = STEPS[current];
+  const total = STEPS.length;
+  const pct = (current / (total - 1)) * 100;
+
+  // Progress
+  document.getElementById("progress").style.width = pct + "%";
+
+  // Phase nav
+  const currentPhaseIdx = PHASES.indexOf(step.phase);
+  document.getElementById("phaseNav").innerHTML = PHASES.map((p, i) => {
+    let cls = "phase-pill";
+    if (i === currentPhaseIdx) cls += " active";
+    else if (i < currentPhaseIdx) cls += " done";
+    return `<button class="${cls}" data-phase="${p}">${PHASE_LABELS[p]}</button>`;
+  }).join("");
+
+  // Step label
+  const label = step.phase === "Welcome" || step.phase === "Method" ? step.phase : step.phase;
+  document.getElementById("stepLabel").innerHTML =
+    `${label} <span class="step-counter">${current + 1} / ${total}</span>`;
+
+  // Content
+  document.getElementById("title").textContent = step.title;
+  document.getElementById("subtitle").textContent = step.subtitle;
+  document.getElementById("visualPanel").innerHTML = renderVisual(step);
+  document.getElementById("desc").innerHTML = step.desc;
+
+  // Dots
+  document.getElementById("dots").innerHTML = STEPS.map((_, i) => {
+    let cls = "dot";
+    if (i === current) cls += " active";
+    else if (i < current) cls += " past";
+    return `<div class="${cls}" data-idx="${i}"></div>`;
+  }).join("");
+
+  // Buttons
+  document.getElementById("back").disabled = current === 0;
+  const nextBtn = document.getElementById("next");
+  nextBtn.disabled = current === total - 1;
+  nextBtn.textContent = current === total - 1 ? "Done" : "Next \u2192";
+}
+
+function go(idx) {
+  current = Math.max(0, Math.min(STEPS.length - 1, idx));
+  render();
+  window.scrollTo(0, 0);
+}
+
+// Event delegation
+document.getElementById("back").onclick = () => go(current - 1);
+document.getElementById("next").onclick = () => go(current + 1);
+document.getElementById("dots").onclick = e => {
+  const idx = e.target.dataset.idx;
+  if (idx != null) go(parseInt(idx));
+};
+document.getElementById("phaseNav").onclick = e => {
+  const phase = e.target.dataset.phase;
+  if (!phase) return;
+  const idx = STEPS.findIndex(s => s.phase === phase);
+  if (idx >= 0) go(idx);
+};
+
+// Keyboard nav
+document.addEventListener("keydown", e => {
+  if (e.key === "ArrowRight" || e.key === "ArrowDown") { e.preventDefault(); go(current + 1); }
+  if (e.key === "ArrowLeft" || e.key === "ArrowUp") { e.preventDefault(); go(current - 1); }
+});
+
+// Initial render
+render();
+</script>
+</body>
+</html>

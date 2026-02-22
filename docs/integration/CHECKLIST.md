@@ -5,18 +5,28 @@
 - Constants/specs are in `core/<tool>/domain/specs.py`.
 - Schema checklist exists in `core/<tool>/domain/schema_checklist.md`.
 - Examples exist in `core/<tool>/examples/`.
+- Recommended: include `core/<tool>/examples/edge_cases.json` for adapter portability.
 - `contracts.py` includes a `contracts_version` string in ToolInput/ToolOutput.
 - `core/<tool>/__init__.py` exists.
 - `core/<tool>/README.md` exists with run/usage notes.
-- Application workflows are in `core/<tool>/application/service.py`.
+- Application workflow is split by responsibility in `core/<tool>/application/`:
+- `input_validation.py` (normalize/validate)
+- `decision_logic.py` or equivalent domain decision module(s)
+- `output_mapping.py` (result serialization)
+- `service.py` (facade/re-exports only, optional)
 - Core has no imports of Flask, Click, or adapter modules.
 - Adapter is under `adapters/flask/<tool>/` and is thin.
 - Adapter uses `io.py` for side effects and `presenter.py` for mapping.
 - Adapter declares runtime dependencies in `RUNTIME_DEPENDENCIES.md`.
 - Adapter assets live under `adapters/flask/<tool>/assets/`.
 - Adapter smoke tests exist under `adapters/flask/<tool>/tests/`.
+- Adapter boundary tests validate presenter/request-response mapping (not business logic).
 - Adapter maps input → domain models.
 - Adapter calls core only via `core/<tool>/contracts.run`.
+- Adapter includes `adapters/flask/<tool>/UI_CONTRACT.md` (routes, payloads, errors, UI states).
 - UI/template files are isolated to the adapter.
+- Review gate: can you name each application file's single responsibility?
+- Review gate: can you ask an LLM to edit only one application file for this change?
+- Review gate: could another adapter call the same core contract without changing core?
 - tools_registry entry includes `name`, `description`, `status`, `contracts`, `origin`, `path`, `icon`.
 - `scripts/check_core_purity.py` passes.

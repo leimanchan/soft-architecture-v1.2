@@ -1,0 +1,141 @@
+{% extends "base.html" %}
+
+{% block title %}Avery 5160 Label Generator{% endblock %}
+{% block icon %}tag{% endblock %}
+{% block header %}Avery 5160 Label Generator{% endblock %}
+{% block subtitle %}Upload Excel, design labels, export a print-ready PDF{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('tool_static', filename='style.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="label-generator">
+    <div class="label-progress" aria-hidden="true">
+        <div class="progress-step is-active" data-step="1">
+            <div class="progress-circle">1</div>
+            <div class="progress-label">Upload</div>
+        </div>
+        <div class="progress-step" data-step="2">
+            <div class="progress-circle">2</div>
+            <div class="progress-label">Design</div>
+        </div>
+        <div class="progress-step" data-step="3">
+            <div class="progress-circle">3</div>
+            <div class="progress-label">Download</div>
+        </div>
+    </div>
+
+    <section class="step is-active" id="step1">
+        <div class="upload-area" id="uploadArea" data-upload-input="fileInput">
+            <div class="upload-icon">Spreadsheet Upload</div>
+            <div class="upload-title">Click to upload an Excel file</div>
+            <div class="upload-subtitle">.xlsx or .xls files up to 50MB</div>
+        </div>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" class="hidden-input">
+
+        <div class="status" id="uploadStatus"></div>
+        <div class="spinner" id="uploadSpinner"></div>
+
+        <div class="sheet-selector" id="sheetSelector">
+            <h3>Select Worksheet</h3>
+            <select id="sheetSelect"></select>
+            <button class="btn btn-primary" id="loadSheetBtn">Load Worksheet</button>
+        </div>
+
+        <div class="preview-container" id="previewContainer">
+            <div class="preview-header">
+                <h3>Data Preview</h3>
+                <span class="preview-subtitle">First five rows</span>
+            </div>
+            <div class="data-preview" id="dataPreview"></div>
+            <div class="preview-footer">
+                <span>Total rows: <strong id="totalRows">0</strong></span>
+                <button class="btn btn-primary" id="toDesignBtn">Next: Design Labels</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="step" id="step2">
+        <div class="editor-sheet-bar" id="editorSheetBar">
+            <label for="sheetSelectEditor">Worksheet</label>
+            <select id="sheetSelectEditor"></select>
+            <button class="btn btn-secondary" id="loadSheetEditorBtn">Load</button>
+            <span class="editor-sheet-meta">Rows: <span id="editorTotalRows">0</span></span>
+            <span class="editor-sheet-meta" id="editorSheetStatus"></span>
+        </div>
+
+        <div class="designer-grid">
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Static Text</h3>
+                    <p>Add reusable labels or worksheet names.</p>
+                </div>
+                <div class="panel-body">
+                    <button class="btn btn-primary" id="addWorksheetBtn">Add Worksheet Name</button>
+                    <div class="field-input">
+                        <input type="text" id="customTextInput" placeholder="Type custom text...">
+                        <button class="btn btn-secondary" id="addCustomBtn">Add Custom Text</button>
+                    </div>
+                </div>
+                <div class="panel-footer">
+                    <h3>Data Fields</h3>
+                    <div id="fieldList" class="field-list"></div>
+                </div>
+            </div>
+
+            <div class="panel panel-wide">
+                <div class="panel-header split">
+                    <div>
+                        <h3>Label Fields</h3>
+                        <p>Layout for 2.65" × 1" labels.</p>
+                    </div>
+                    <div class="copies-control">
+                        <label for="copiesPerRecord">Copies per record</label>
+                        <input type="number" id="copiesPerRecord" value="1" min="1" max="30">
+                    </div>
+                </div>
+                <div class="panel-body" id="addedFieldsList">
+                    <p class="empty-state">Click fields on the left to add them to your label.</p>
+                </div>
+                <div class="panel-footer hint">Click a field to edit its properties on the right.</div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-header">
+                    <h3>Field Properties</h3>
+                    <p>Fine-tune the selected field.</p>
+                </div>
+                <div class="panel-body" id="fieldControls">
+                    <p class="empty-state">Select a label field to edit its settings.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="action-row">
+            <button class="btn btn-secondary" id="backBtn">Back</button>
+            <div class="action-row-right">
+                <button class="btn btn-secondary" id="resetBtn">Start New Label</button>
+                <button class="btn btn-secondary" id="withTemplateBtn">With Template</button>
+                <button class="btn btn-primary" id="generateBtn">Generate PDF</button>
+            </div>
+        </div>
+    </section>
+
+    <section class="step" id="step3">
+        <div class="download-panel">
+            <div class="download-icon">Ready</div>
+            <h2>Labels Generated</h2>
+            <p>Your PDF is ready to download.</p>
+            <button class="btn btn-primary" id="restartBtn">Create More Labels</button>
+        </div>
+    </section>
+
+    <div class="spinner" id="generateSpinner"></div>
+    <div class="status" id="generateStatus"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('tool_static', filename='app.js') }}"></script>
+{% endblock %}
