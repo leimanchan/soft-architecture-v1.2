@@ -1,0 +1,836 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Next Level — From Single Tools to Enterprise Systems</title>
+  <style>
+    :root {
+      --bg: #0a0c10;
+      --surface: #12141a;
+      --panel: #181b24;
+      --border: #1f2330;
+      --text: #e8ecf4;
+      --muted: #9aa3b8;
+      --dim: #6b7590;
+      --faint: #3d4560;
+      --accent: #63b3ed;
+      --orange: #ed8936;
+      --green: #48bb78;
+      --blue: #63b3ed;
+      --purple: #b794f4;
+      --red: #fc8181;
+      --gold: #ecc94b;
+      --teal: #38b2ac;
+      --code-bg: #0e1018;
+      --glow-blue: rgba(99,179,237,0.12);
+      --glow-green: rgba(72,187,120,0.10);
+      --glow-orange: rgba(237,137,54,0.10);
+      --glow-purple: rgba(183,148,244,0.10);
+      --glow-teal: rgba(56,178,172,0.10);
+      --glow-gold: rgba(236,201,75,0.10);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.75;-webkit-font-smoothing:antialiased}
+
+    .reading-progress{position:fixed;top:0;left:0;right:0;height:3px;background:var(--surface);z-index:100}
+    .reading-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--purple),var(--teal),var(--gold),var(--orange));transition:width .15s ease}
+
+    .nav{position:fixed;top:3px;left:0;right:0;background:rgba(10,12,16,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:99;padding:0 20px}
+    .nav-inner{max-width:800px;margin:0 auto;display:flex;align-items:center;gap:6px;overflow-x:auto;padding:10px 0;scrollbar-width:none}
+    .nav-inner::-webkit-scrollbar{display:none}
+    .nav-pill{padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;color:var(--faint);cursor:pointer;transition:all .25s;border:none;background:0 0;white-space:nowrap;letter-spacing:.3px;text-decoration:none}
+    .nav-pill:hover{color:var(--muted);background:rgba(255,255,255,.04)}
+    .nav-pill.active{background:rgba(183,148,244,.12);color:var(--purple)}
+
+    .container{max-width:760px;margin:0 auto;padding:80px 24px 120px}
+    section{margin-bottom:100px;scroll-margin-top:64px}
+
+    .section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2.5px;margin-bottom:12px}
+    .section-label.orange{color:var(--orange)}.section-label.green{color:var(--green)}.section-label.blue{color:var(--blue)}.section-label.purple{color:var(--purple)}.section-label.gold{color:var(--gold)}.section-label.teal{color:var(--teal)}
+
+    h1{font-size:clamp(30px,5.5vw,48px);font-weight:800;line-height:1.1;margin-bottom:16px;background:linear-gradient(135deg,#f7fafc 0%,var(--purple) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    h2{font-size:clamp(22px,4vw,32px);font-weight:800;line-height:1.2;margin-bottom:12px;color:#f7fafc}
+    h3{font-size:18px;font-weight:700;margin-bottom:8px;color:var(--text)}
+    .subtitle{font-size:clamp(15px,2.5vw,19px);color:var(--dim);line-height:1.6;margin-bottom:32px;max-width:620px}
+    p{margin-bottom:20px;color:var(--muted);font-size:16px}
+    p strong{color:var(--text);font-weight:600}
+    p em{color:var(--accent);font-style:normal}
+
+    .hero{min-height:80vh;display:flex;flex-direction:column;justify-content:center;margin-bottom:80px;scroll-margin-top:64px}
+    .hero-tagline{font-size:14px;color:var(--dim);margin-top:24px;border-left:3px solid var(--faint);padding-left:16px;line-height:1.8}
+    .hero-prev{display:inline-block;padding:8px 18px;border-radius:10px;font-size:13px;font-weight:600;color:var(--green);border:1.5px solid rgba(72,187,120,.3);background:rgba(72,187,120,.06);text-decoration:none;margin-bottom:20px;transition:all .2s}
+    .hero-prev:hover{background:rgba(72,187,120,.12)}
+
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:24px;margin:24px 0}
+    .panel.glow-blue{border-color:rgba(99,179,237,.25);background:linear-gradient(135deg,var(--panel),rgba(99,179,237,.04))}
+    .panel.glow-green{border-color:rgba(72,187,120,.25);background:linear-gradient(135deg,var(--panel),rgba(72,187,120,.04))}
+    .panel.glow-orange{border-color:rgba(237,137,54,.25);background:linear-gradient(135deg,var(--panel),rgba(237,137,54,.04))}
+    .panel.glow-purple{border-color:rgba(183,148,244,.25);background:linear-gradient(135deg,var(--panel),rgba(183,148,244,.04))}
+    .panel.glow-teal{border-color:rgba(56,178,172,.25);background:linear-gradient(135deg,var(--panel),rgba(56,178,172,.04))}
+    .panel.glow-gold{border-color:rgba(236,201,75,.25);background:linear-gradient(135deg,var(--panel),rgba(236,201,75,.04))}
+    .panel-title{font-size:13px;font-weight:700;margin-bottom:12px;letter-spacing:.5px}
+
+    .analogy{border-radius:14px;padding:20px 24px;margin:24px 0;border-left:4px solid;background:var(--surface)}
+    .analogy.blue{border-left-color:var(--blue)}.analogy.green{border-left-color:var(--green)}.analogy.orange{border-left-color:var(--orange)}.analogy.purple{border-left-color:var(--purple)}.analogy.teal{border-left-color:var(--teal)}.analogy.gold{border-left-color:var(--gold)}
+    .analogy-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+    .analogy-label.blue{color:var(--blue)}.analogy-label.green{color:var(--green)}.analogy-label.orange{color:var(--orange)}.analogy-label.purple{color:var(--purple)}.analogy-label.teal{color:var(--teal)}.analogy-label.gold{color:var(--gold)}
+    .analogy p{font-size:15px;margin-bottom:10px}
+    .analogy p:last-child{margin-bottom:0}
+
+    .code-block{background:var(--code-bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;margin:20px 0;font-family:'JetBrains Mono','SF Mono','Fira Code',ui-monospace,monospace;font-size:13px;line-height:2;overflow-x:auto;-webkit-overflow-scrolling:touch}
+    .code-line{display:flex;gap:14px;align-items:baseline;padding:2px 0;border-left:3px solid transparent;padding-left:14px;margin-left:-14px;border-radius:2px;flex-wrap:wrap}
+    .code-line.hi{background:var(--glow-blue);border-left-color:var(--blue)}
+    .code-line.hi-orange{background:var(--glow-orange);border-left-color:var(--orange)}
+    .code-line.hi-green{background:var(--glow-green);border-left-color:var(--green)}
+    .code-line.hi-purple{background:var(--glow-purple);border-left-color:var(--purple)}
+    .code-line.hi-teal{background:var(--glow-teal);border-left-color:var(--teal)}
+    .code-text{color:var(--dim);white-space:pre;min-width:0}
+    .code-line.hi .code-text,.code-line.hi-orange .code-text,.code-line.hi-green .code-text,.code-line.hi-purple .code-text,.code-line.hi-teal .code-text{color:var(--text)}
+    .code-note{color:var(--accent);font-size:12px;opacity:.9;white-space:normal;min-width:0}
+    .code-note.orange{color:var(--orange)}.code-note.green{color:var(--green)}.code-note.purple{color:var(--purple)}.code-note.teal{color:var(--teal)}
+
+    .explain{background:var(--surface);border-radius:12px;padding:18px 22px;margin:16px 0;border:1px solid var(--border)}
+    .explain-title{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;color:var(--accent)}
+    .explain p{font-size:14px;margin-bottom:8px}
+    .explain p:last-child{margin-bottom:0}
+
+    .flow{display:flex;flex-direction:column;align-items:center;gap:8px;padding:16px 0}
+    .flow-box{border-radius:14px;padding:16px 28px;text-align:center;width:100%;max-width:380px;border:2px solid}
+    .flow-box-name{font-weight:800;font-size:15px}
+    .flow-box-desc{font-size:13px;color:var(--muted);margin-top:4px}
+    .flow-arrow{display:flex;flex-direction:column;align-items:center;gap:2px}
+    .flow-arrow-line{width:2px;height:14px;background:var(--faint)}
+    .flow-arrow-label{background:var(--surface);padding:4px 16px;border-radius:20px;font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace;border:1px solid var(--border)}
+    .flow-arrow-tip{width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-top:8px solid var(--faint)}
+
+    .flow-h{display:flex;align-items:center;gap:8px;justify-content:center;flex-wrap:wrap;padding:12px 0}
+    .flow-h-box{border-radius:12px;padding:12px 18px;text-align:center;border:2px solid;min-width:100px;flex:1;max-width:180px}
+    .flow-h-arrow{color:var(--faint);font-size:20px;flex-shrink:0}
+
+    .step-grid{display:flex;flex-direction:column;gap:16px;margin:24px 0}
+    .step-item{display:flex;gap:16px;align-items:flex-start;padding:18px 22px;border-radius:14px;border:2px solid;transition:transform .2s}
+    .step-item:hover{transform:translateY(-1px)}
+    .step-num{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff;flex-shrink:0}
+    .step-content{flex:1;min-width:0}
+    .step-title{font-weight:800;font-size:15px;margin-bottom:4px}
+    .step-desc{font-size:14px;color:var(--muted);line-height:1.6}
+
+    .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+    .compare-box{border-radius:14px;padding:20px;border:2px solid}
+    .compare-title{font-size:13px;font-weight:700;margin-bottom:10px}
+    .compare-body{font-size:14px;color:var(--muted);line-height:1.7}
+    @media(max-width:580px){.compare{grid-template-columns:1fr}}
+
+    .file-tree{font-family:'JetBrains Mono',monospace;font-size:13px;line-height:2.2;padding:8px 0}
+    .file-tree-line{display:flex;gap:12px;align-items:baseline}
+    .file-tree-path{color:var(--dim)}.file-tree-path.active{color:var(--text);font-weight:600}
+    .file-tree-note{color:var(--accent);font-size:11px}
+    .file-tree-note.orange{color:var(--orange)}.file-tree-note.green{color:var(--green)}.file-tree-note.purple{color:var(--purple)}.file-tree-note.teal{color:var(--teal)}
+
+    .sandwich{display:flex;flex-direction:column;gap:6px;max-width:480px;margin:24px auto}
+    .sandwich-layer{display:flex;align-items:center;gap:14px;padding:14px 20px;border-radius:12px;border:1.5px solid}
+    .sandwich-label{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:13px}
+    .sandwich-type{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-top:2px;color:var(--muted)}
+    .sandwich-icon{font-size:22px;flex-shrink:0}
+
+    .railway{display:flex;flex-direction:column;gap:4px;margin:24px 0;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--border)}
+    .railway-track{display:flex;align-items:center;gap:10px;padding:6px 14px;border-radius:8px}
+    .railway-track.ok{border-left:3px solid var(--green)}
+    .railway-track.err{border-left:3px solid var(--red)}
+    .railway-track-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;width:36px;flex-shrink:0}
+    .railway-track-label.ok{color:var(--green)}.railway-track-label.err{color:var(--red)}
+    .railway-step{font-size:13px;font-family:'JetBrains Mono',monospace;color:var(--muted)}
+    .railway-step.active{color:var(--text);font-weight:600}
+
+    .timeline{display:flex;flex-direction:column;gap:0;margin:24px 0}
+    .timeline-item{display:flex;gap:16px;padding:20px 0}
+    .timeline-bar{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:32px}
+    .timeline-dot{width:14px;height:14px;border-radius:50%;border:3px solid;flex-shrink:0}
+    .timeline-line{width:2px;flex:1;background:var(--border);margin-top:4px}
+    .timeline-content{flex:1;min-width:0;padding-bottom:8px}
+    .timeline-title{font-weight:700;font-size:15px;margin-bottom:4px}
+    .timeline-desc{font-size:14px;color:var(--muted);line-height:1.6}
+
+    .divider{height:1px;background:var(--border);margin:60px 0}
+
+    .checklist{list-style:none;margin:20px 0}
+    .checklist li{padding:8px 0 8px 28px;position:relative;font-size:14px;color:var(--muted);line-height:1.6}
+    .checklist li::before{content:'';position:absolute;left:0;top:12px;width:16px;height:16px;border-radius:4px;border:2px solid var(--faint)}
+    .checklist li strong{color:var(--text)}
+
+    footer{text-align:center;padding:60px 24px;font-size:13px;color:var(--faint);line-height:1.8}
+    footer strong{color:var(--dim)}
+
+    @media(max-width:480px){
+      .container{padding:70px 16px 80px}
+      section{margin-bottom:72px}
+      .panel{padding:18px}
+      .code-block{padding:14px 16px;font-size:12px}
+      .analogy{padding:16px 18px}
+      .step-item{padding:14px 16px;flex-direction:column;gap:10px}
+      .step-num{width:32px;height:32px;font-size:14px}
+      .flow-box{padding:14px 20px}
+      .flow-h-box{min-width:80px;padding:10px 12px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-fill" id="progressFill"></div></div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a class="nav-pill" href="#start">Start</a>
+    <a class="nav-pill" href="#the-problem">The Problem</a>
+    <a class="nav-pill" href="#translators">Translators</a>
+    <a class="nav-pill" href="#flow-runner">Flow Runner</a>
+    <a class="nav-pill" href="#railway">Railway</a>
+    <a class="nav-pill" href="#compensation">Compensation</a>
+    <a class="nav-pill" href="#testing">Testing</a>
+    <a class="nav-pill" href="#growth">Growth</a>
+    <a class="nav-pill" href="#erp-vision">ERP Vision</a>
+    <a class="nav-pill" href="#your-roadmap">Roadmap</a>
+  </div>
+</nav>
+
+<div class="container">
+
+<!-- ================================================================ -->
+<!-- HERO -->
+<!-- ================================================================ -->
+<section class="hero" id="start">
+  <a class="hero-prev" href="your-foundation.html">&#x2190; Previous: Your Foundation</a>
+  <div class="section-label purple">Your Next Level</div>
+  <h1>From Single Tools to Enterprise Systems</h1>
+  <div class="subtitle">
+    You learned to build a brick. Now learn to build the wall &mdash; and see the path from wall to building to city. This is your guide to composing tools into real business workflows, explained for someone who thinks in systems, not syntax.
+  </div>
+  <div class="hero-tagline">
+    In <strong>Your Foundation</strong>, you learned every line of a single tool &mdash; how data shapes flow through a 3-line orchestrator, how the brain stays pure and the adapters handle the messy real world. You saw where it stops: one tool can't talk to another.<br><br>
+    This document solves that problem. It also shows you the full arc &mdash; from where you are now to an agentic MIS/ERP system that enterprises pay for. The gap is real, the timeline is real, and <strong>starting now is the single smartest move you can make.</strong>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 1: THE PROBLEM -->
+<!-- ================================================================ -->
+<section id="the-problem">
+  <div class="section-label orange">Part One</div>
+  <h2>Why Good Bricks Aren't Enough</h2>
+
+  <p>You have an <em>order_quote</em> tool that calculates pricing. You have an <em>invoice_generator</em> tool that produces PDFs. Each is perfectly built &mdash; clean contracts, pure logic, comprehensive tests. Each works flawlessly in isolation.</p>
+
+  <p>Now a client says: <strong>"When a customer submits an order, I need pricing calculated, credit checked, and an invoice generated automatically."</strong></p>
+
+  <p>Three tools need to talk to each other. How hard could it be? Here's the naive approach:</p>
+
+  <div class="code-block">
+    <div class="code-line hi-orange"><span class="code-text">quote = order_quote.run(order_input)</span><span class="code-note orange">Step 1: Calculate pricing</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line hi-orange"><span class="code-text">invoice_input = InvoiceInput(</span><span class="code-note orange">Step 2: Manually wire the output to the next input</span></div>
+    <div class="code-line"><span class="code-text">    customer=quote.customer_name,</span><span class="code-note">Copy this field</span></div>
+    <div class="code-line"><span class="code-text">    line_items=quote.items,</span><span class="code-note">Copy that field</span></div>
+    <div class="code-line"><span class="code-text">    total=quote.total_cents,</span><span class="code-note">Copy this one too</span></div>
+    <div class="code-line"><span class="code-text">)</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line hi-orange"><span class="code-text">invoice = invoice_generator.run(invoice_input)</span><span class="code-note orange">Step 3: Generate the invoice</span></div>
+  </div>
+
+  <div class="explain">
+    <div class="explain-title">Looks fine. What's wrong?</div>
+    <p>You just <strong>hardwired</strong> the output shape of tool A directly into the input of tool B. If order_quote renames <code>customer_name</code> to <code>customer</code>, this script breaks &mdash; and so does every other place these tools connect.</p>
+    <p>Worse: <strong>What if the quote returns an error?</strong> This code crashes. What if the credit check says "denied" &mdash; do we still generate the invoice? What if we need to insert a fourth tool between them later?</p>
+    <p>That 6-line script is the seed of the same concrete the first manifesto warned about. Except now it's growing <strong>between</strong> your tools instead of inside them.</p>
+  </div>
+
+  <div class="analogy orange">
+    <div class="analogy-label orange">The Business Analogy</div>
+    <p>Imagine you built three perfect departments: sales, credit, and billing. Each does their job brilliantly. But the "process" of moving an order through all three is a guy named Dave who walks paperwork between desks, translating by memory.</p>
+    <p>Dave knows that sales calls it "customer_name" but billing calls it "client." Dave knows the credit team needs the total in dollars, but sales outputs it in cents. Dave carries all of this in his head. <strong>When Dave quits, the process collapses.</strong></p>
+    <p>The naive wiring code IS Dave. The composition discipline you're about to learn replaces Dave with <strong>documented, tested, replaceable translation layers</strong>.</p>
+  </div>
+
+  <h3 style="margin-top:36px">The Glue Trap: Why 70% of Your Code Becomes Wiring</h3>
+
+  <p>Research shows that roughly <strong>70% of development effort</strong> in integrated systems goes to "glue code" &mdash; the wiring between components. Not because glue is hard, but because <strong>nobody plans it</strong>. Nobody designs it. Nobody tests it.</p>
+
+  <p>And here's the math that makes it terrifying:</p>
+
+  <div class="panel glow-orange">
+    <div class="panel-title" style="color:var(--orange)">The N-Squared Problem</div>
+    <p style="font-size:15px"><strong>5 tools</strong> that talk to each other = up to <strong>25</strong> connection points<br>
+    <strong>10 tools</strong> = up to <strong>100</strong> connection points<br>
+    <strong>20 tools</strong> = up to <strong>400</strong> connection points</p>
+    <p style="font-size:14px">Without discipline, the glue overwhelms the tools. You built 20 beautiful bricks and drowned them in sloppy mortar. An enterprise ERP might have <strong>50+ tools</strong>. Without composition architecture, that's 2,500 potential connections. <strong>This is why enterprise systems cost millions and take years.</strong></p>
+  </div>
+
+  <div class="analogy purple">
+    <div class="analogy-label purple">The Core Insight</div>
+    <p>Inside a tool, coupling comes from <strong>mixing decisions with plumbing</strong>. (You learned this.)</p>
+    <p>Between tools, coupling comes from <strong>mixing translation with orchestration</strong>. (This is new.)</p>
+    <p><strong>Translation</strong> = converting one tool's output into another tool's input (mapping fields, transforming data).</p>
+    <p><strong>Orchestration</strong> = deciding which tools run in what order and what happens when something fails.</p>
+    <p>When these two live in the same code, you get the same rigidity problem &mdash; just one level up. The solution is the same too: <strong>separate them.</strong></p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 2: TRANSLATORS -->
+<!-- ================================================================ -->
+<section id="translators">
+  <div class="section-label green">Part Two</div>
+  <h2>Translators: The Mortar Between Bricks</h2>
+
+  <p>The first new concept is the <strong>translator</strong>. It's a pure function that converts one tool's output into another tool's input. Nothing more. Nothing less.</p>
+
+  <div class="code-block">
+    <div class="code-line"><span class="code-text"># translators.py &mdash; pure functions, no I/O, no flow logic</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line hi-green"><span class="code-text">def quote_to_invoice_input(quote):</span><span class="code-note green">Takes QuoteOutput, returns InvoiceInput</span></div>
+    <div class="code-line"><span class="code-text">    return InvoiceInput(</span><span class="code-note"></span></div>
+    <div class="code-line"><span class="code-text">        customer=quote.customer_name,</span><span class="code-note">Map this field to that field</span></div>
+    <div class="code-line"><span class="code-text">        line_items=[</span></div>
+    <div class="code-line"><span class="code-text">            InvoiceLineItem(</span></div>
+    <div class="code-line"><span class="code-text">                description=item.product_name,</span><span class="code-note">Quote calls it "product_name", invoice calls it "description"</span></div>
+    <div class="code-line"><span class="code-text">                quantity=item.qty,</span></div>
+    <div class="code-line"><span class="code-text">                unit_price_cents=item.unit_price_cents,</span></div>
+    <div class="code-line"><span class="code-text">                total_cents=item.line_total_cents,</span></div>
+    <div class="code-line"><span class="code-text">            )</span></div>
+    <div class="code-line"><span class="code-text">            for item in quote.items</span><span class="code-note">Do this for each item in the quote</span></div>
+    <div class="code-line"><span class="code-text">        ],</span></div>
+    <div class="code-line"><span class="code-text">        subtotal_cents=quote.subtotal_cents,</span></div>
+    <div class="code-line"><span class="code-text">        tax_cents=quote.tax_cents,</span></div>
+    <div class="code-line"><span class="code-text">        total_cents=quote.total_cents,</span></div>
+    <div class="code-line"><span class="code-text">    )</span></div>
+  </div>
+
+  <div class="explain">
+    <div class="explain-title">What this does, in plain English</div>
+    <p>The quote tool says "customer_name." The invoice tool expects "customer." This function translates. The quote tool says "product_name." The invoice expects "description." This function translates.</p>
+    <p>It's <strong>exactly</strong> what Dave was doing by memory &mdash; except now it's written down, tested, and replaceable. When the quote tool changes its output, <strong>only this function changes</strong>. The invoice tool never knows. The flow runner never knows. Every other translator is untouched.</p>
+    <p><strong>Key rules for translators:</strong></p>
+    <p>&bull; Pure function &mdash; no files, no web, no database. Just data in, data out.</p>
+    <p>&bull; One direction only &mdash; quote-to-invoice is one function. Invoice-to-quote (if you ever need it) is a <em>separate</em> function.</p>
+    <p>&bull; Independently testable &mdash; give it a QuoteOutput, check that you get the right InvoiceInput.</p>
+  </div>
+
+  <div class="analogy green">
+    <div class="analogy-label green">Why one direction only?</div>
+    <p>Think of a human translator at the UN. One translator handles English-to-French. A different translator handles French-to-English. They're different skills, different contexts, different edge cases.</p>
+    <p>If you build a single "bidirectional" translator, it becomes complicated, hard to test, and serves two masters. One-way translators are <strong>simpler, easier to test, and easier to replace</strong>.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 3: FLOW RUNNER -->
+<!-- ================================================================ -->
+<section id="flow-runner">
+  <div class="section-label purple">Part Three</div>
+  <h2>The Flow Runner: The Dumb Orchestrator, One Level Up</h2>
+
+  <p>Inside a single tool, the orchestrator was 3 lines and had zero branching. Between tools, the same rule applies &mdash; the <strong>flow runner</strong> is a dumb recipe that calls tools and translators in order.</p>
+
+  <div class="code-block">
+    <div class="code-line"><span class="code-text"># flow.py &mdash; the dumb flow runner</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line hi-purple"><span class="code-text">def run_order_flow(order_input):</span><span class="code-note purple">The entire business process</span></div>
+    <div class="code-line"><span class="code-text">    steps = [</span><span class="code-note">A list of (name, tool, translator) tuples</span></div>
+    <div class="code-line hi-orange"><span class="code-text">        ("quote",   order_quote.run,      None),</span><span class="code-note orange">Step 1: calculate pricing</span></div>
+    <div class="code-line hi-green"><span class="code-text">        ("credit",  credit_check.run,      quote_to_credit),</span><span class="code-note green">Step 2: check credit (translate first)</span></div>
+    <div class="code-line hi"><span class="code-text">        ("invoice", invoice_generator.run, quote_to_invoice),</span><span class="code-note">Step 3: generate invoice (translate first)</span></div>
+    <div class="code-line"><span class="code-text">    ]</span></div>
+    <div class="code-line"><span class="code-text">    results = {}</span><span class="code-note">Track what each step produced</span></div>
+    <div class="code-line"><span class="code-text">    for name, tool_run, translator in steps:</span><span class="code-note">Walk through each step...</span></div>
+    <div class="code-line"><span class="code-text">        input_data = translator(prev) if translator else order_input</span><span class="code-note">Translate if needed</span></div>
+    <div class="code-line"><span class="code-text">        result = safe_run(name, tool_run, input_data)</span><span class="code-note">Run the tool safely</span></div>
+    <div class="code-line"><span class="code-text">        if isinstance(result, Err):</span><span class="code-note">If it failed...</span></div>
+    <div class="code-line"><span class="code-text">            return FlowResult.failed(step=name, completed=results)</span><span class="code-note">...stop and report what happened</span></div>
+    <div class="code-line"><span class="code-text">        results[name] = result.value</span><span class="code-note">Otherwise, save the result and continue</span></div>
+    <div class="code-line"><span class="code-text">    return FlowResult.success(results)</span><span class="code-note">All done! Return everything.</span></div>
+  </div>
+
+  <div class="explain">
+    <div class="explain-title">What you're looking at</div>
+    <p>This is a <strong>for-loop over a list of steps</strong>. That's it. Under 20 lines. No business logic. No field mapping. No "if the credit is denied, do X." Just: run each step, translate between them, stop if something fails.</p>
+
+    <p><strong><code>steps = [...]</code></strong> &mdash; The recipe. A list of 3-part instructions: what to call this step, which tool to run, and which translator to apply before running it. <code>None</code> means no translation needed (it's the first step, so it uses the original input).</p>
+
+    <p><strong><code>for name, tool_run, translator in steps:</code></strong> &mdash; "Walk through each step. Unpack its name, its tool function, and its translator."</p>
+
+    <p><strong><code>safe_run(name, tool_run, input_data)</code></strong> &mdash; Runs the tool and catches any errors, wrapping them in a result type (more on this next).</p>
+
+    <p><strong>The constraint:</strong> Maximum 40 lines. Zero business logic. Zero data translation. Zero error recovery logic. If your flow runner grows past 30 lines, something has leaked in that belongs in a translator or a decision function.</p>
+  </div>
+
+  <div class="analogy purple">
+    <div class="analogy-label purple">Think of it like a project manager</div>
+    <p>A good project manager doesn't do the work. They don't write code, don't design graphics, don't close sales. They say: <strong>"First, sales prepares the quote. Then, give that to credit for review. Then, give it to billing for the invoice."</strong></p>
+    <p>They don't translate between departments (that's the translator's job). They don't decide what to do about a denied credit check (that's a decision function). They just <strong>run the sequence</strong>.</p>
+    <p>If you find your project manager doing the actual work, something's wrong with your org structure. Same with the flow runner.</p>
+  </div>
+
+  <p>Every composed workflow gets its own directory, mirroring how tools are structured:</p>
+
+  <div class="panel">
+    <div class="file-tree">
+      <div class="file-tree-line"><span class="file-tree-path active">flows/order_to_invoice/</span><span class="file-tree-note purple">One directory per workflow</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;DECISIONS.md</span><span class="file-tree-note">What decisions does this FLOW make?</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;models.py</span><span class="file-tree-note green">FlowResult, FlowDecision shapes</span></div>
+      <div class="file-tree-line"><span class="file-tree-path active">&nbsp;&nbsp;translators.py</span><span class="file-tree-note green">Pure functions: tool A output &rarr; tool B input</span></div>
+      <div class="file-tree-line"><span class="file-tree-path active">&nbsp;&nbsp;decisions.py</span><span class="file-tree-note orange">Pure functions: flow-level decisions</span></div>
+      <div class="file-tree-line"><span class="file-tree-path active">&nbsp;&nbsp;flow.py</span><span class="file-tree-note purple">The dumb flow runner (~20 lines)</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;compensation.py</span><span class="file-tree-note teal">What to undo when steps fail</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;tests/</span><span class="file-tree-note">Tests for translators, decisions, and the flow</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 4: RAILWAY -->
+<!-- ================================================================ -->
+<section id="railway">
+  <div class="section-label teal">Part Four</div>
+  <h2>Result Types &amp; The Railway Pattern</h2>
+
+  <p>Inside a single tool, if a function fails, Python throws an error and everything stops. Simple. But in a multi-tool flow, you need to know <strong>which step failed, what succeeded before it, and what might need undoing</strong>. Crashes aren't good enough.</p>
+
+  <p>The solution: every step returns a <strong>Result type</strong> &mdash; either <em>Ok</em> (success with a value) or <em>Err</em> (failure with a reason).</p>
+
+  <div class="code-block">
+    <div class="code-line hi-green"><span class="code-text">@dataclass</span></div>
+    <div class="code-line hi-green"><span class="code-text">class Ok:</span><span class="code-note green">"It worked. Here's the value."</span></div>
+    <div class="code-line"><span class="code-text">    value: object</span><span class="code-note">The actual result data</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line" style="border-left-color:var(--red);background:rgba(252,129,129,.06)"><span class="code-text">@dataclass</span></div>
+    <div class="code-line" style="border-left-color:var(--red);background:rgba(252,129,129,.06)"><span class="code-text">class Err:</span><span class="code-note" style="color:var(--red)">"It failed. Here's why."</span></div>
+    <div class="code-line"><span class="code-text">    error: str</span><span class="code-note">What went wrong</span></div>
+    <div class="code-line"><span class="code-text">    context: dict</span><span class="code-note">Extra info (which step, partial results)</span></div>
+  </div>
+
+  <div class="explain">
+    <div class="explain-title">In plain English</div>
+    <p>Instead of code that <strong>crashes</strong> when something goes wrong (losing all context), every step returns a labeled package: either "here's your result" (Ok) or "here's what went wrong and where" (Err).</p>
+    <p><strong><code>@dataclass</code></strong> &mdash; just means "this is a data form." You learned this in Your Foundation.</p>
+    <p><strong><code>value: object</code></strong> &mdash; The actual data. Could be a QuoteOutput, a CreditDecision, anything.</p>
+    <p><strong><code>context: dict</code></strong> &mdash; A dictionary of extra information: which step failed, what partial results were produced before it, what inputs were used. Everything a human (or a compensation handler) needs to understand what happened.</p>
+  </div>
+
+  <p>This creates what's called the <strong>Railway Pattern</strong>. Visualize two tracks:</p>
+
+  <div class="railway">
+    <div class="railway-track ok">
+      <span class="railway-track-label ok">OK</span>
+      <span class="railway-step active">quote &rarr; translate &rarr; credit &rarr; translate &rarr; invoice &rarr; done!</span>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--faint);padding:4px 0">&#x2B07; diverts on failure &#x2B07;</div>
+    <div class="railway-track err">
+      <span class="railway-track-label err">ERR</span>
+      <span class="railway-step">credit denied &rarr; skip invoice &rarr; return failure with context</span>
+    </div>
+  </div>
+
+  <div class="explain">
+    <div class="explain-title">Two tracks, no branching</div>
+    <p>The flow rides the <strong>green track</strong> (Ok) as long as everything succeeds. The moment any step fails or a decision says "stop," the flow diverts to the <strong>red track</strong> (Err). No <code>if</code> statements in the flow runner. The Result type handles the branching <em>automatically</em>.</p>
+    <p><strong>Why this matters for enterprise:</strong> When a client asks "what happened to order #4872?", you don't say "it crashed." You say "the quote succeeded ($1,080), the credit check returned 'review required,' and the invoice was never generated. The partial results are preserved. Here's exactly where it stopped and why."</p>
+    <p>That's the difference between amateur software and enterprise software. <strong>It's not about preventing failure. It's about handling failure with full visibility.</strong></p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 5: COMPENSATION -->
+<!-- ================================================================ -->
+<section id="compensation">
+  <div class="section-label teal">Part Five</div>
+  <h2>Compensation: The Undo Button</h2>
+
+  <p>Here's the hardest problem in composed systems: <strong>what happens when step 3 fails but steps 1 and 2 already did real-world things?</strong></p>
+
+  <p>The credit check approved the customer. The payment was charged. Then the invoice generation fails. The customer was charged but never got an invoice. You need to <strong>undo</strong> the charge.</p>
+
+  <div class="code-block">
+    <div class="code-line"><span class="code-text"># compensation.py &mdash; what to undo when the flow fails</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line hi-teal"><span class="code-text">compensations = {</span><span class="code-note teal">For each step that touches the real world...</span></div>
+    <div class="code-line"><span class="code-text">    "charge_payment": lambda ctx: refund(ctx["payment_id"]),</span><span class="code-note">...define the reverse action</span></div>
+    <div class="code-line"><span class="code-text">    "send_invoice":   lambda ctx: void_invoice(ctx["invoice_id"]),</span></div>
+    <div class="code-line"><span class="code-text">    "reserve_stock":  lambda ctx: release(ctx["reservation_id"]),</span></div>
+    <div class="code-line"><span class="code-text">}</span></div>
+    <div class="code-line"><span class="code-text"></span></div>
+    <div class="code-line hi-teal"><span class="code-text">def compensate(completed_steps, failed_step):</span><span class="code-note teal">Run undos in REVERSE order</span></div>
+    <div class="code-line"><span class="code-text">    for step in reversed(completed_steps):</span><span class="code-note">Last completed step gets undone first</span></div>
+    <div class="code-line"><span class="code-text">        if step in compensations:</span></div>
+    <div class="code-line"><span class="code-text">            compensations[step](completed_steps[step])</span><span class="code-note">Run the undo with the step's context</span></div>
+  </div>
+
+  <div class="explain">
+    <div class="explain-title">The beautiful payoff of pure tools</div>
+    <p>Here's where everything comes together. Remember: the tools in core/ are <strong>pure math</strong>. They don't charge payments, send emails, or write to databases. Only the <strong>adapters</strong> do real-world things.</p>
+    <p>So in a 5-step flow where 3 steps are pure computations and 2 steps are adapter calls, you only need <strong>2 compensations, not 5</strong>. The pure steps produced data, not effects. Data doesn't need undoing.</p>
+    <p>This is why the first manifesto's rule &mdash; "side effects at the edges" &mdash; pays <strong>compound interest</strong> at the composition level. The fewer real-world effects your system produces, the less you need to undo when things go wrong. The more confidently you can compose complex flows.</p>
+  </div>
+
+  <div class="analogy teal">
+    <div class="analogy-label teal">Business analogy: the refund policy</div>
+    <p>A good business defines refund procedures <strong>before</strong> they sell the first product. Not after a customer complains. Not after the accountant discovers a discrepancy.</p>
+    <p>Compensation is your refund procedure for each step: if we charged the card, the undo is a refund. If we reserved inventory, the undo is a release. If we sent an email &mdash; well, you can't unsend it, so the compensation is a follow-up correction email.</p>
+    <p><strong>The rule:</strong> every step that touches the real world must define its undo. This is written alongside the flow, not scattered across different files. And compensations must be <em>idempotent</em> &mdash; running them twice produces the same result as running them once (because in failure scenarios, you might accidentally trigger the undo more than once).</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 6: TESTING -->
+<!-- ================================================================ -->
+<section id="testing">
+  <div class="section-label blue">Part Six</div>
+  <h2>Three Levels of Composition Testing</h2>
+
+  <p>Inside a tool, you test that functions produce correct outputs. Between tools, you test something different: that <strong>tool A's output actually works as tool B's input</strong>, even though they know nothing about each other.</p>
+
+  <div class="step-grid">
+    <div class="step-item" style="border-color:rgba(72,187,120,.3);background:rgba(72,187,120,.04)">
+      <div class="step-num" style="background:var(--green)">1</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--green)">Translator Tests</div>
+        <div class="step-desc">"Given this QuoteOutput, does the translator produce the correct InvoiceInput?" Pure unit tests. Fast. Deterministic. Tests every field mapping.</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(99,179,237,.3);background:rgba(99,179,237,.04)">
+      <div class="step-num" style="background:var(--blue)">2</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--blue)">Contract Compatibility Tests</div>
+        <div class="step-desc">Run tool A with real input. Pass the <strong>real output</strong> through the translator. Feed it to tool B. Does tool B accept it without error? This catches the subtle mismatches &mdash; like one tool using cents and another using dollars &mdash; that look fine in isolation but explode when connected.</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(183,148,244,.3);background:rgba(183,148,244,.04)">
+      <div class="step-num" style="background:var(--purple)">3</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--purple)">End-to-End Flow Tests</div>
+        <div class="step-desc">Run the entire flow with realistic input. Verify the final output. Because all tools are pure math, these tests require <strong>no databases, no network, no files</strong> and run in milliseconds. You can test a 5-tool enterprise workflow as easily as testing a calculator.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glow-blue">
+    <div class="panel-title" style="color:var(--blue)">The Catch That Only Level 2 Finds</div>
+    <p style="font-size:14px">The order_quote tool returns amounts in <strong>cents</strong> (integer: 10800). The invoice_generator expects amounts in <strong>dollars</strong> (float: 108.00). Both tools pass their own tests. But when composed, the invoice shows <strong>$10,800 instead of $108.00</strong>.</p>
+    <p style="font-size:14px">This is the <strong>impedance mismatch problem</strong> &mdash; the most common failure in composed systems. It's not a bug in either tool. It's a bug in the <em>assumption</em> that they're compatible. Level 2 tests catch this by running <strong>real outputs through real translators into real inputs</strong>.</p>
+    <p style="font-size:14px">When a tool changes its contract, the compatibility tests for <strong>every flow that uses it</strong> fail simultaneously. This is the desired behavior &mdash; you find all the breakage at once, not one at a time in production.</p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 7: GROWTH -->
+<!-- ================================================================ -->
+<section id="growth">
+  <div class="section-label green">Part Seven</div>
+  <h2>Growing a System Flow by Flow</h2>
+
+  <p>Just like tools grow by adding files (not making files bigger), composed systems grow by <strong>adding flows</strong> (not making flows bigger).</p>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--orange)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--orange)">Month 1: Order-to-Invoice</div>
+        <div class="timeline-desc">Build the first flow. 3 tools, 2 translators, 1 flow runner. It works. Ship it.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--green)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--green)">Month 2: Add Payment</div>
+        <div class="timeline-desc"><strong>Don't modify</strong> order-to-invoice. Build a NEW flow: invoice-to-payment. 2 tools, 1 translator. The original flow is untouched.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--blue)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--blue)">Month 3: End-to-End</div>
+        <div class="timeline-desc">Need order-to-payment? Build a NEW flow that <strong>composes the two existing flows</strong>. It calls order-to-invoice, then invoice-to-payment. One new translator. Both sub-flows untouched.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--purple)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--purple)">Month 4: Refunds</div>
+        <div class="timeline-desc">Build process-refund. New flow, new translators, new compensations. References the payment tool but through its own translator. All order flows untouched.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--gold)"></div><div class="timeline-line" style="background:transparent"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--gold)">Month 6: A Real System</div>
+        <div class="timeline-desc">4 flows, 8 tools, 10 translators. Each flow is a directory. Each existing flow was <strong>never modified</strong> after it shipped. That's growth by addition &mdash; the same principle from the first manifesto, applied one level up.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="file-tree">
+      <div class="file-tree-line"><span class="file-tree-path active">flows/</span><span class="file-tree-note purple">Each workflow is a directory</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;order_to_invoice/</span><span class="file-tree-note">Low-level flow</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;invoice_to_payment/</span><span class="file-tree-note">Low-level flow</span></div>
+      <div class="file-tree-line"><span class="file-tree-path active">&nbsp;&nbsp;order_to_payment/</span><span class="file-tree-note purple">Composes the two above</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;process_refund/</span><span class="file-tree-note">Independent flow</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 8: THE ERP VISION -->
+<!-- ================================================================ -->
+<section id="erp-vision">
+  <div class="section-label gold">Part Eight</div>
+  <h2>The Vision: From Flows to Agentic ERP</h2>
+
+  <p>Now let's zoom out. <strong>Way</strong> out. You've learned to build bricks (tools) and walls (flows). An enterprise MIS/ERP system is the <em>building</em>. And the emerging concept of agentic AI is what makes the building intelligent.</p>
+
+  <p>Here's where the industry is right now, and why your timing is right:</p>
+
+  <div class="panel glow-gold">
+    <div class="panel-title" style="color:var(--gold)">The State of Play (2025-2026)</div>
+    <p style="font-size:14px"><strong>78% of IT leaders</strong> expect ERP functionality to be replaced or augmented by agentic AI within 3 years. But only <strong>23%</strong> have successfully scaled autonomous AI across operations. That gap is where the opportunity lives.</p>
+    <p style="font-size:14px">Gartner forecasts <strong>40% of business applications</strong> will embed task-specific AI agents by end of 2026, up from under 5% in 2025. McKinsey identifies the core challenge: LLMs have been "fundamentally reactive and isolated from enterprise systems" &mdash; unable to retain memory, coordinate across sessions, or operate as persistent, embedded systems.</p>
+    <p style="font-size:14px">The companies that win will be the ones that solve <strong>composition</strong> &mdash; wiring AI agents into reliable, testable, compensable workflows. Sound familiar?</p>
+  </div>
+
+  <h3 style="margin-top:32px">The Three Layers You're Building Toward</h3>
+
+  <div class="step-grid">
+    <div class="step-item" style="border-color:rgba(237,137,54,.3);background:rgba(237,137,54,.04)">
+      <div class="step-num" style="background:var(--orange)">1</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--orange)">Tools Layer (Where You Are)</div>
+        <div class="step-desc">Individual business functions, each a Soft Code tool with pure logic, tested contracts, and clean adapters. Order pricing, credit checks, invoice generation, inventory lookups. These are your bricks.</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(183,148,244,.3);background:rgba(183,148,244,.04)">
+      <div class="step-num" style="background:var(--purple)">2</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--purple)">Flows Layer (What You're Learning Now)</div>
+        <div class="step-desc">Composed workflows that wire tools together with translators, result types, and compensation. Order-to-invoice, procure-to-pay, forecast-to-plan. These are your walls.</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(236,201,75,.3);background:rgba(236,201,75,.04)">
+      <div class="step-num" style="background:var(--gold);color:#1a1a2e">3</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--gold)">Agent Layer (Where Enterprise Is Going)</div>
+        <div class="step-desc">AI agents that can <strong>select and orchestrate flows</strong> based on context. A customer support agent that decides: "this is a refund request" &rarr; triggers the process_refund flow. A procurement agent that: receives a purchase request &rarr; checks budget (tool) &rarr; finds vendors (tool) &rarr; creates PO (flow) &rarr; routes for approval (flow). <strong>The agent chooses the flows. The flows run the tools. The tools do the math.</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="analogy gold">
+    <div class="analogy-label gold">The fractal pattern</div>
+    <p>Inside a function: separate decisions from plumbing.</p>
+    <p>Inside a tool: separate core from adapters.</p>
+    <p>Between tools: separate flows from translators.</p>
+    <p>Between flows: separate agent decisions from flow execution.</p>
+    <p><strong>The same principle at every level.</strong> That's why learning it at the tool level gives you the mental model for every level above it. You're not learning one technique &mdash; you're learning the technique that scales to infinity.</p>
+  </div>
+
+  <h3 style="margin-top:36px">What Makes an Agentic System Trustworthy</h3>
+
+  <p>The industry is converging on five requirements for enterprise-grade agentic systems:</p>
+
+  <div class="step-grid">
+    <div class="step-item" style="border-color:rgba(56,178,172,.3);background:rgba(56,178,172,.04)">
+      <div class="step-num" style="background:var(--teal)">1</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--teal)">Observability</div>
+        <div class="step-desc">You can see exactly what every agent did, which flow it triggered, which tools ran, what data flowed between them. Because your tools produce <strong>plain data at every boundary</strong>, every step is inspectable. This is built into the architecture you're learning.</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(56,178,172,.3);background:rgba(56,178,172,.04)">
+      <div class="step-num" style="background:var(--teal)">2</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--teal)">Human-in-the-Loop</div>
+        <div class="step-desc">Agents can handle routine decisions autonomously, but sensitive actions (large refunds, new vendor approvals, credit overrides) route to a human for approval. The flow runner already supports this &mdash; it's just a decision function that returns "needs_review" instead of "proceed."</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(56,178,172,.3);background:rgba(56,178,172,.04)">
+      <div class="step-num" style="background:var(--teal)">3</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--teal)">Compensation &amp; Rollback</div>
+        <div class="step-desc">When an agent-triggered workflow fails partway through, the system knows exactly what to undo. You're learning this now with compensation handlers.</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(56,178,172,.3);background:rgba(56,178,172,.04)">
+      <div class="step-num" style="background:var(--teal)">4</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--teal)">Contract Testing</div>
+        <div class="step-desc">When an AI agent selects a flow, you need <strong>provable guarantees</strong> that the flow works correctly. The 3-level testing pyramid (translator tests, compatibility tests, end-to-end tests) gives you that proof. An enterprise client doesn't accept "it usually works." They accept "here are 147 passing tests."</div>
+      </div>
+    </div>
+    <div class="step-item" style="border-color:rgba(56,178,172,.3);background:rgba(56,178,172,.04)">
+      <div class="step-num" style="background:var(--teal)">5</div>
+      <div class="step-content">
+        <div class="step-title" style="color:var(--teal)">Governance &amp; Audit Trail</div>
+        <div class="step-desc">Every decision &mdash; by agent or human &mdash; is logged as a Result type with full context. "Agent selected process_refund flow. Credit check returned Ok. Payment refund returned Ok. Total processing time: 340ms." This is the audit trail regulators need.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glow-purple">
+    <div class="panel-title" style="color:var(--purple)">The Current Gap &mdash; And Why It's Your Advantage</div>
+    <p style="font-size:14px">The gap between current AI and enterprise reality is real. LLMs make mistakes. They hallucinate. They lack persistent memory. They can't reliably coordinate across complex workflows &mdash; <em>yet</em>.</p>
+    <p style="font-size:14px">But here's the thing: <strong>the architecture doesn't depend on perfect AI</strong>. The tools are pure math &mdash; deterministic, tested, reliable. The flows are deterministic pipelines with explicit error handling. The AI agent layer sits on top, selecting which flows to run &mdash; and the human-in-the-loop catches its mistakes.</p>
+    <p style="font-size:14px">As LLMs get better, you loosen the human-in-the-loop constraints. You let the agent handle more autonomously. But the architecture underneath <strong>never changes</strong>. That's the whole point. You're building the foundation that makes AI useful <em>today</em> and powerful <em>tomorrow</em>.</p>
+    <p style="font-size:14px"><strong>The people who understand this architecture when LLMs reach enterprise capability will be the architects. Everyone else will be the users.</strong></p>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 9: WHETHER NEW REPO OR SAME -->
+<!-- ================================================================ -->
+<section id="repo-decision">
+  <div class="section-label orange">Part Nine</div>
+  <h2>Same Repo or New Repo?</h2>
+
+  <p>This is a practical question. The answer follows directly from the architecture:</p>
+
+  <div class="compare">
+    <div class="compare-box" style="border-color:var(--green);background:rgba(72,187,120,.04)">
+      <div class="compare-title" style="color:var(--green)">Keep in the Same Repo</div>
+      <div class="compare-body">
+        <strong>The tools layer</strong> (core/, adapters/) stays exactly where it is. No changes needed.<br><br>
+        <strong>Add a flows/ directory</strong> at the repo root. Each composed workflow gets its own subdirectory with translators, decisions, flow runner, compensation, and tests.<br><br>
+        <strong>Why:</strong> Flows depend on tool contracts. Keeping them in the same repo means contract compatibility tests can import directly from core/. When a tool changes, the flow tests fail immediately &mdash; in the same CI pipeline.
+      </div>
+    </div>
+    <div class="compare-box" style="border-color:rgba(183,148,244,.25);background:rgba(183,148,244,.04)">
+      <div class="compare-title" style="color:var(--purple)">Separate Repo Later</div>
+      <div class="compare-body">
+        <strong>When you have 15+ tools and 10+ flows</strong>, the repo may get large enough that a split makes sense.<br><br>
+        At that point: tools become a <strong>library package</strong> with versioned contracts. Flows import tools via package version, not file path.<br><br>
+        <strong>But not yet.</strong> Premature splitting creates more problems than it solves. Start in one repo. Split when the pain of a single repo exceeds the pain of managing two.
+      </div>
+    </div>
+  </div>
+
+  <p>The recommended structure for your next phase:</p>
+
+  <div class="panel">
+    <div class="file-tree">
+      <div class="file-tree-line"><span class="file-tree-path active">tool-hub/</span><span class="file-tree-note">Your existing repo</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;core/</span><span class="file-tree-note green">Tools (unchanged)</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;&nbsp;&nbsp;label_generator/</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;&nbsp;&nbsp;order_quote/</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;adapters/</span><span class="file-tree-note orange">Adapters (unchanged)</span></div>
+      <div class="file-tree-line"><span class="file-tree-path active">&nbsp;&nbsp;flows/</span><span class="file-tree-note purple">NEW: composed workflows</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;&nbsp;&nbsp;order_to_invoice/</span><span class="file-tree-note purple">translators, decisions, flow, tests</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;&nbsp;&nbsp;flow_registry.json</span><span class="file-tree-note">Registry of all flows</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;common/</span><span class="file-tree-note teal">NEW: shared data shapes (Money, Customer, etc.)</span></div>
+      <div class="file-tree-line"><span class="file-tree-path">&nbsp;&nbsp;scripts/</span><span class="file-tree-note">Add flow validation checks here</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================================================================ -->
+<!-- PART 10: YOUR ROADMAP -->
+<!-- ================================================================ -->
+<section id="your-roadmap">
+  <div class="section-label gold">Part Ten</div>
+  <h2>Your Roadmap</h2>
+
+  <div class="timeline">
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--green)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--green)">Phase 1: Master the Brick (Where You Are)</div>
+        <div class="timeline-desc">Build 2-3 more tools using the Soft Code workflow. Run preflight until everything passes. Get the discipline into your muscle memory. Use the code-reading trainer until you can read any tool in 3 minutes.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--purple)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--purple)">Phase 2: Build Your First Flow (Next)</div>
+        <div class="timeline-desc">Pick two tools that logically connect. Write the translator. Write the flow runner. Write the three levels of tests. Add a flows/ directory to your repo. Feel what it's like to compose tools without coupling them.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--blue)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--blue)">Phase 3: Add Compensation &amp; Result Types</div>
+        <div class="timeline-desc">Build a flow that touches the real world (sends an email, writes a file). Implement compensation. Implement the railway pattern. Test failure scenarios. This is where you go from "it works" to "it works reliably."</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--orange)"></div><div class="timeline-line"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--orange)">Phase 4: Build a Real Business Workflow</div>
+        <div class="timeline-desc">Pick a real enterprise process: procure-to-pay, order-to-cash, or record-to-report. Build 4-5 tools and 2-3 flows that handle it end-to-end. This is your portfolio piece &mdash; the thing you show an enterprise client.</div>
+      </div>
+    </div>
+    <div class="timeline-item">
+      <div class="timeline-bar"><div class="timeline-dot" style="border-color:var(--gold)"></div><div class="timeline-line" style="background:transparent"></div></div>
+      <div class="timeline-content">
+        <div class="timeline-title" style="color:var(--gold)">Phase 5: Add the Agent Layer</div>
+        <div class="timeline-desc">Build an AI agent that can select and trigger flows based on natural language input. "Process a refund for order #4872" &rarr; agent selects process_refund flow &rarr; flow runs tools &rarr; result returned with full audit trail. Human-in-the-loop for sensitive actions. <strong>This is the agentic ERP.</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel glow-gold">
+    <div class="panel-title" style="color:var(--gold)">The Composition Checklist (Your New Preflight)</div>
+    <ul class="checklist">
+      <li><strong>Before writing any composition code:</strong> Can I draw the tools as boxes and the data flows as arrows?</li>
+      <li>For each arrow, do I know what shape goes in and what comes out?</li>
+      <li>Have I identified which decisions belong to the flow (not to any tool)?</li>
+      <li>Have I identified which steps produce side effects that need compensation?</li>
+      <li><strong>When writing translators:</strong> Is each one a pure function, one direction only?</li>
+      <li>Does each translator handle edge cases (None values, empty collections)?</li>
+      <li><strong>When writing the flow runner:</strong> Is it under 40 lines?</li>
+      <li>Does it contain zero business logic and zero translation logic?</li>
+      <li>Does it use Result types at every tool boundary?</li>
+      <li><strong>When testing:</strong> Level 1 translator tests? Level 2 compatibility tests? Level 3 end-to-end?</li>
+      <li>Do contract tests use real tool outputs, not hand-crafted fakes?</li>
+      <li><strong>When handling failures:</strong> Are compensations defined for every side-effect step?</li>
+      <li>Are compensations idempotent and tested?</li>
+      <li><strong>When growing:</strong> Am I adding a new flow directory, not modifying existing flows?</li>
+    </ul>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="analogy gold">
+    <div class="analogy-label gold">A Final Word</div>
+    <p>The manifesto said: <em>"Decoupling is not an architecture you adopt once. It is a discipline you apply with every function, every file, every prompt you give to an LLM."</em></p>
+    <p>Composition extends that: <strong>the discipline applies with every tool, every translator, every flow.</strong></p>
+    <p>The bricks are the tools. The mortar is the translators. The walls are the flows. Each material has its own discipline. A well-built wall requires well-made bricks, properly mixed mortar, and careful placement. Skip any one and the wall won't hold.</p>
+    <p>You have the business instinct. You have the architectural mental model. You have the discipline framework. And you're learning it at the exact right moment &mdash; before the industry figures out how to do this at scale.</p>
+    <p><strong>The people building the architecture now will be the ones the enterprise clients call. Everyone else will be bidding on the scraps.</strong></p>
+  </div>
+
+  <div class="panel" style="border-color:rgba(99,179,237,.3);background:var(--glow-blue);margin-top:40px">
+    <div class="panel-title" style="color:var(--blue)">Your Reading Order (Updated)</div>
+    <p style="font-size:14px;margin-bottom:12px"><strong style="color:var(--green)">&#x2713; Done:</strong> your-foundation.html &mdash; understanding the brick</p>
+    <p style="font-size:14px;margin-bottom:12px"><strong style="color:var(--green)">&#x2713; Done:</strong> code-reading-trainer.html &mdash; reading any tool in 5 minutes</p>
+    <p style="font-size:14px;margin-bottom:12px"><strong style="color:var(--green)">&#x2713; Done:</strong> BUILDING_SOFTWARE_THAT_STAYS_SOFT.md &mdash; the first manifesto</p>
+    <p style="font-size:14px;margin-bottom:12px"><strong style="color:var(--purple)">&#x25B6; You are here:</strong> your-next-level.html &mdash; building the wall</p>
+    <p style="font-size:14px;margin-bottom:12px"><strong style="color:var(--dim)">Deep reference:</strong> COMPOSING_SOFTWARE_THAT_STAYS_SOFT.docx &mdash; the full composition manifesto</p>
+    <p style="font-size:14px;margin-bottom:0"><strong style="color:var(--dim)">Hands-on:</strong> Build your first flow in the repo &mdash; add flows/ directory, pick two tools, wire them</p>
+  </div>
+</section>
+
+</div>
+
+<footer>
+  <strong>Your Next Level</strong> &mdash; From single tools to enterprise systems.<br>
+  The architecture is fractal. Learn it at one level, apply it at every level above.<br><br>
+  <span style="color:var(--faint)">tool-hub &bull; Soft Code Composition &bull; 2026</span><br><br>
+  <span style="font-size:11px">Research sources: <a href="https://www.bain.com/insights/is-agentic-ai-the-inflection-point-for-scaling-ERP-transformations/" style="color:var(--faint)">Bain</a> &bull; <a href="https://www.mckinsey.com/capabilities/mckinsey-technology/our-insights/bridging-the-great-ai-agent-and-erp-divide-to-unlock-value-at-scale" style="color:var(--faint)">McKinsey</a> &bull; <a href="https://architect.salesforce.com/fundamentals/agentic-enterprise-it-architecture" style="color:var(--faint)">Salesforce</a> &bull; <a href="https://learn.microsoft.com/en-us/azure/architecture/ai-ml/guide/ai-agent-design-patterns" style="color:var(--faint)">Microsoft</a></span>
+</footer>
+
+<script>
+window.addEventListener('scroll',()=>{const h=document.documentElement;const p=(h.scrollTop/(h.scrollHeight-h.clientHeight))*100;document.getElementById('progressFill').style.width=Math.min(p,100)+'%'});
+const sections=document.querySelectorAll('section[id]');
+const pills=document.querySelectorAll('.nav-pill');
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const id=e.target.id;pills.forEach(p=>{p.classList.toggle('active',p.getAttribute('href')==='#'+id)})}})},{rootMargin:'-80px 0px -60% 0px',threshold:0});
+sections.forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
