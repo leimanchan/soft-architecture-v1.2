@@ -157,3 +157,23 @@ python3 scripts/run_code_reading_trainer.py
 ```
 
 Then open `http://127.0.0.1:8012/code-reading-trainer.html`.
+
+## GitHub Pages (Phone Study)
+
+The trainer is publish-ready at:
+
+- `site/index.html`
+
+To publish on GitHub Pages:
+
+1. Push your branch with `site/index.html`.
+2. Open GitHub repo settings -> `Pages`.
+3. Under `Build and deployment`, choose `Deploy from a branch`.
+4. Select your branch (for example `migration-instructions-hardening`) and folder `/site`.
+5. Save and wait for the Pages URL to appear.
+
+On iPhone:
+
+1. Open the Pages URL in Safari.
+2. Tap Share -> `Add to Home Screen`.
+3. Launch it like an app during the day.
